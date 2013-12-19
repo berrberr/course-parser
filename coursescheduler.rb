@@ -1,7 +1,6 @@
 
 class CourseScheduler
   def does_course_fit(course_times, day_times)
-    puts course_times
     conflicts = 0
     day_times.each do |id, times|
       if ((course_times[:start] >= times[:start]) and (course_times[:start] >= times[:end])) then
@@ -18,15 +17,25 @@ class CourseScheduler
   def random_schedule(data)
     schedule = {:MO => {}, :TU => {}, :WE => {}, :TH => {}, :FR => {}}
     data.each do |course_info|
+      course_fits = true
       course_info[:times].each do |id, time_option|
         time_option.each do |day, times|
-          if times then schedule[day].merge!({course_info[:id] => times}) end
+          #if times then schedule[day].merge!({course_info[:id] => times}) end
+          if times and day then
+            if does_course_fit(times, schedule[day]) then
+              next
+            else
+              course_fits = false
+              next
+            end
+          end
         end
       end
     end
     return schedule
   end
 end
+
 dataset = [
   { :id => "1A1", :times => {
     1 => {
