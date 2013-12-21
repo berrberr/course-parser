@@ -1,6 +1,13 @@
+# recursively merge 2 hashes, works for hash of hashes
+def recurse_merge(a, b)
+  a.merge(b) do |_, x, y|
+    (x.is_a?(Hash) && y.is_a?(Hash)) ? recurse_merge(x,y) : [*x,*y]
+  end
+end
 
 class CourseScheduler
   def does_course_fit(course_times, day_times)
+    puts "TESTING: #{course_times}\nINTO: #{day_times}"
     conflicts = 0
     day_times.each do |id, times|
       if ((course_times[:start] >= times[:start]) and (course_times[:start] >= times[:end])) then
@@ -8,9 +15,11 @@ class CourseScheduler
       elsif ((course_times[:start] < times[:start]) and (course_times[:end] <= times[:start])) then
         next
       else
+        puts "CONFLICT"
         return false
       end
     end
+    puts "FITS"
     return true
   end
 
@@ -18,23 +27,38 @@ class CourseScheduler
     schedule = {:MO => {}, :TU => {}, :WE => {}, :TH => {}, :FR => {}}
     data.each do |course_info|
       course_fits = true
+      course_scheduled = false
+
       course_info[:times].each do |id, time_option|
-        time_option.each do |day, times|
-          #if times then schedule[day].merge!({course_info[:id] => times}) end
-          if times and day then
-            if does_course_fit(times, schedule[day]) then
-              next
-            else
-              course_fits = false
-              next
+        unless course_scheduled
+          tmp_schedule = {:MO => {}, :TU => {}, :WE => {}, :TH => {}, :FR => {}}
+          time_option.each do |day, times|
+            #if times then schedule[day].merge!({course_info[:id] => times}) end
+            unless (times.nil? and day.nil?)
+              if does_course_fit(times, schedule[day]) then
+                tmp_schedule[day].merge!({course_info[:id] => times})
+              else
+                course_fits = false
+              end
             end
+            #puts tmp_schedule
+          end
+          if course_fits then
+            schedule = recurse_merge(schedule, tmp_schedule)
+            puts schedule
+            course_scheduled = true
           end
         end
+      end
+
+      unless course_scheduled
+        #return "schedule not possible"
       end
     end
     return schedule
   end
 end
+
 
 dataset = [
   { :id => "1A1", :times => {
@@ -81,4 +105,4 @@ dataset = [
   }
 ]
 
-#puts random_schedule(dataset)
+puts CourseScheduler.new.random_schedule(dataset)
