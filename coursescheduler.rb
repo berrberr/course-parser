@@ -34,25 +34,23 @@ class CourseScheduler
           tmp_schedule = {:MO => {}, :TU => {}, :WE => {}, :TH => {}, :FR => {}}
           time_option.each do |day, times|
             #if times then schedule[day].merge!({course_info[:id] => times}) end
-            unless (times.nil? and day.nil?)
-              if does_course_fit(times, schedule[day]) then
-                tmp_schedule[day].merge!({course_info[:id] => times})
-              else
-                course_fits = false
-              end
+            if does_course_fit(times, schedule[day]) then
+              tmp_schedule[day].merge!({course_info[:id] => times})
+            else
+              course_fits = false
             end
-            #puts tmp_schedule
           end
-          if course_fits then
-            schedule = recurse_merge(schedule, tmp_schedule)
-            puts schedule
-            course_scheduled = true
-          end
+        end
+        
+        if course_fits then
+          schedule = recurse_merge(schedule, tmp_schedule)
+          puts schedule
+          course_scheduled = true
         end
       end
 
       unless course_scheduled
-        #return "schedule not possible"
+        return "schedule not possible"
       end
     end
     return schedule
@@ -101,6 +99,15 @@ dataset = [
     3 => {
       :FR => { :start => 900, :end => 1200}
     }},
+    :length => 180
+  },
+  {
+    :id => "2A1", :times => {
+      1 => {
+        :MO => { :start => 900, :end => 1000},
+        :TU => { :start => 1200, :end => 1400}
+      }
+    },
     :length => 180
   }
 ]
