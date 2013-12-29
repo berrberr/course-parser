@@ -1,5 +1,6 @@
 # recursively merge 2 hashes, works for hash of hashes
 def recurse_merge(a, b)
+  puts "a: #{a} b: #{b}"
   a.merge(b) do |_, x, y|
     (x.is_a?(Hash) && y.is_a?(Hash)) ? recurse_merge(x,y) : [*x,*y]
   end
@@ -41,11 +42,17 @@ class CourseScheduler
             end
           end
         end
-        
+
         if course_fits then
-          schedule = recurse_merge(schedule, tmp_schedule)
-          puts schedule
-          course_scheduled = true
+          puts "schedu: #{schedule}"
+          if(defined? schedule && defined? tmp_schedule) then
+            schedule.each do |day, data|
+              puts "day: #{day} data: #{data}"
+              schedule[day] = recurse_merge(schedule[day], tmp_schedule[day])
+            end
+            puts schedule
+            course_scheduled = true
+          end
         end
       end
 
