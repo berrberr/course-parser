@@ -33,31 +33,36 @@ class CourseScheduler
       course_info[:times].each do |id, time_option|
         unless course_scheduled
           tmp_schedule = {:MO => {}, :TU => {}, :WE => {}, :TH => {}, :FR => {}}
+
+          #loop through the course's time options and try to fit them into the current schedule
           time_option.each do |day, times|
             #if times then schedule[day].merge!({course_info[:id] => times}) end
             if does_course_fit(times, schedule[day]) then
               tmp_schedule[day].merge!({course_info[:id] => times})
+              course_fits = true
             else
               course_fits = false
+              break #if one of the course times doesn't fit, then this course time option cannot be sched so break out of the loop over this course time options
             end
           end
-        end
 
-        if course_fits then
-          puts "schedu: #{schedule}"
-          if(defined? schedule && defined? tmp_schedule) then
-            schedule.each do |day, data|
-              puts "day: #{day} data: #{data}"
-              schedule[day] = recurse_merge(schedule[day], tmp_schedule[day])
+          #if the course then add it to the main schedule, set course_scheduled to true
+          if course_fits then
+            puts "schedu: #{schedule}"
+            if(defined? schedule && defined? tmp_schedule) then
+              schedule.each do |day, data|
+                puts "day: #{day} data: #{data} tmp: #{tmp_schedule}"
+                schedule[day] = recurse_merge(schedule[day], tmp_schedule[day])
+              end
+              puts schedule
+              course_scheduled = true
             end
-            puts schedule
-            course_scheduled = true
           end
         end
       end
 
       unless course_scheduled
-        return "schedule not possible"
+        return "schedule not possible - course: #{course_info[:id]} current sched: #{schedule}"
       end
     end
     return schedule
