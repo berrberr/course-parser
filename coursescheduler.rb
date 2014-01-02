@@ -1,16 +1,34 @@
 # recursively merge 2 hashes, works for hash of hashes
 def recurse_merge(a, b)
-  puts "a: #{a} b: #{b}"
   a.merge(b) do |_, x, y|
     (x.is_a?(Hash) && y.is_a?(Hash)) ? recurse_merge(x,y) : [*x,*y]
   end
 end
 
 class CourseScheduler
+
+  #calculate a timetables "rating", critera is space between classes
+  def get_schedule_rating(schedule)
+    rating = 0
+    schedule.each do |day, day_data|
+      new_day = true #we haven't iterated over this day's courses yet
+      last_time = 0 #the last course's end time
+      day_data.each do |course_id, course_data|
+        if new_day then
+          new_day = false
+          last_time = course_data[:end]
+        else
+          rating += course_data[:start] - last_time
+        end
+      end
+    end
+    return rating
+  end
+
   def does_course_fit(course_times, day_times)
-    puts "TESTING: #{course_times}\nINTO: #{day_times}"
-    conflicts = 0
-    day_times.each do |id, times|
+    #puts "TESTING: #{course_times}\nINTO: #{day_times}"
+    day_times.each do |times|
+      puts "TIMES #{times}"
       if ((course_times[:start] >= times[:start]) and (course_times[:start] >= times[:end])) then
         next
       elsif ((course_times[:start] < times[:start]) and (course_times[:end] <= times[:start])) then
@@ -25,20 +43,22 @@ class CourseScheduler
   end
 
   def random_schedule(data)
-    schedule = {:MO => {}, :TU => {}, :WE => {}, :TH => {}, :FR => {}}
+    data.shuffle! #randomize the order of the courses
+    schedule = {:MO => [], :TU => [], :WE => [], :TH => [], :FR => []}
     data.each do |course_info|
       course_fits = true
       course_scheduled = false
 
       course_info[:times].each do |id, time_option|
         unless course_scheduled
-          tmp_schedule = {:MO => {}, :TU => {}, :WE => {}, :TH => {}, :FR => {}}
+          tmp_schedule = {:MO => [], :TU => [], :WE => [], :TH => [], :FR => []}
 
           #loop through the course's time options and try to fit them into the current schedule
           time_option.each do |day, times|
             #if times then schedule[day].merge!({course_info[:id] => times}) end
             if does_course_fit(times, schedule[day]) then
-              tmp_schedule[day].merge!({course_info[:id] => times})
+              #tmp_schedule[day].merge!({course_info[:id] => times})
+              tmp_schedule[day] << {:id => course_info[:id], :start => times[:start], :end => times[:end]}
               course_fits = true
             else
               course_fits = false
@@ -48,11 +68,11 @@ class CourseScheduler
 
           #if the course then add it to the main schedule, set course_scheduled to true
           if course_fits then
-            puts "schedu: #{schedule}"
+            #puts "schedu: #{schedule}"
             if(defined? schedule && defined? tmp_schedule) then
-              schedule.each do |day, data|
-                puts "day: #{day} data: #{data} tmp: #{tmp_schedule}"
-                schedule[day] = recurse_merge(schedule[day], tmp_schedule[day])
+              schedule.each do |day, day_data|
+                #schedule[day] = recurse_merge(schedule[day], tmp_schedule[day])
+                schedule[day] << tmp_schedule[day]
               end
               puts schedule
               course_scheduled = true
@@ -62,14 +82,14 @@ class CourseScheduler
       end
 
       unless course_scheduled
-        return "schedule not possible - course: #{course_info[:id]} current sched: #{schedule}"
+        return false #"schedule not possible - course: #{course_info[:id]} current sched: #{schedule}"
       end
     end
     return schedule
   end
 end
 
-
+#TODO: change this datastructure to array => hash => array => hash
 dataset = [
   { :id => "1A1", :times => {
     1 => {
@@ -124,4 +144,13 @@ dataset = [
   }
 ]
 
-puts CourseScheduler.new.random_schedule(dataset)
+#puts CourseScheduler.new.random_schedule(dataset)
+cs = CourseScheduler.new
+
+(1..10).each do |i|
+  schedule = CourseScheduler.new.random_schedule(dataset)
+  if schedule then
+    rating = cs.get_schedule_rating(schedule)
+    puts "SCHEDULE #{schedule} \n RATING: #{rating}"
+  end
+end
