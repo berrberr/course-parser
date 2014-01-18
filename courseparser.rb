@@ -27,8 +27,19 @@ doc.css('div.item-container').each do |coursebox|
   if coursebox.css('span.course-desc')[0] then 
     row[:description] = coursebox.css('span.course-desc')[0].content.strip 
   end
-  if coursebox.css('span.course-prereq')[1] then
-    row[:prereq] = coursebox.css('span.course-prereq')[1]["id"]
+
+  if coursebox.css('td.myCell')[0] then
+    coursebox.css('span.course-label').each do |inner|
+      if inner.content.strip.index('Prereq') then
+        row[:prereq] = inner.next_element.content
+      end
+      if inner.content.strip.index('Antireq') then
+        row[:antireq] = inner.next_element.content
+      end
+      if inner.content.strip.index('Cross-List') then
+        row[:crosslist] = inner.next_element.content
+      end
+    end
   end
   
   if !!row then
@@ -37,3 +48,4 @@ doc.css('div.item-container').each do |coursebox|
 end
 
 puts output
+
