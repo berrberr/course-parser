@@ -1,0 +1,9 @@
+{
+  "require": {
+    "gabordemooij/redbean": "dev-master",
+    "slim/slim": "2.*"
+  },
+  "config": {
+    "vendor-dir": "app/vendor"
+  }
+}
