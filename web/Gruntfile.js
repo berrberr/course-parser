@@ -33,6 +33,16 @@ module.exports = function (grunt) {
           },
           {
             nonnull: true,
+            src: 'lib/requirejs/require.js',
+            dest: 'public_webapp/scripts/vendor/requirejs/require.js'
+          },
+          {
+            nonnull: true,
+            src: 'lib/requirejs-text/text.js',
+            dest: 'public_webapp/scripts/vendor/requirejs/text.js'
+          },
+          {
+            nonnull: true,
             expand: true,
             cwd: 'lib/bootstrap/dist/fonts/',
             src: ["**"],
