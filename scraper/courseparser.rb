@@ -1,10 +1,8 @@
 require 'nokogiri'
 require 'open-uri'
 require 'json'
-require 'mongo'
 require 'optparse'
-
-include Mongo
+#require 'mysql2'
 
 # coursecode: span class='course-code'
 # coursetitle: span class='course-title'
@@ -19,7 +17,10 @@ end
 def parse_file(filename)
   f = File.open(filename)
   doc = Nokogiri::HTML(f)
-  output = []
+  output = {}
+  puts doc.css('span.page-title').inspect
+  output[:subject_name] = doc.css('span.page-title')[0].text
+  output[:data] = []
 
   doc.css('div.item-container').each do |coursebox|
     row = {}
@@ -52,8 +53,12 @@ def parse_file(filename)
       end
     end
     
-    if !!row then
-      output << row
+    if !row.empty? then
+      output[:data] << row
+    end
+
+    if output[:subject_code] == nil and row[:subject_code] != nil then
+      output[:subject_code] = row[:subject_code]
     end
 
   end
@@ -63,13 +68,24 @@ end
 
 def parse_files_in_folder(folder_name)
   puts 'Starting parse on folder: ' + folder_name
-  course_db = MongoClient.new('localhost', 27017).db('courses')
+  #client = Mysql2::Client.new(:host => 'localhost', :username => 'root', :database => 'courselist')
 
   Dir.foreach(folder_name) do |file|
     next if file == '.' or file == '..'
     file_path = folder_name + '/' + file
     course_info = parse_file(file_path)
-    course_db.collection('course_list').insert(course_info)
+    data_hash = course_info[:data]
+    data_hash.each do |dh|
+      dh.each { |k, v| dh[k] = client.escape(v.to_s) }
+      q = "INSERT INTO courses(code, subject_code, title, description, prereq, antireq, crosslist)
+            VALUES('#{dh[:code]}', '#{dh[:subject_code]}', '#{dh[:title]}', '#{dh[:description]}', '#{dh[:prereq]}', '#{dh[:antireq]}', '#{dh[:crosslist]}')"
+      result = client.query(q)
+    end
+
+    q = "INSERT INTO subjects(subject_id, name)
+          VALUES('#{data_hash[:subject_code]', '#{data_hash[:subject_name]}'}"
+            
+    #course_db.collection('course_list').insert(course_info)
     puts 'Parsed and wrote to DB: ' + file_path
   end
 end
@@ -78,6 +94,10 @@ OptionParser.new do |opts|
   opts.banner = 'Usage: courseparser.rb [directory_path]'
 
   opts.on('-d', '--directory DIR', 'Directory Path') { |d| parse_files_in_folder(d) }
+  opts.on('-p', '--parse FILE', 'File path') { |p| 
+    output = parse_file(p) 
+    puts output.inspect
+  }
 end.parse!
 
 #puts parse_file('pages/18012014/18012014-0021-pg1752.html')

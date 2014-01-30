@@ -1,8 +1,12 @@
-define(['text!templates/course/courseitem.html'], function(template) {
+define(['text!templates/course/courseitem.html', 'views/course/coursedetailview'], function(template, CourseDetailView) {
   var CourseItemView = Backbone.View.extend({
     tagName: 'li',
     className: 'course-item',
     template: _.template(template),
+
+    events: {
+      'click': 'updateCourseDetail'
+    },
 
     initialize: function() {
 
@@ -13,6 +17,11 @@ define(['text!templates/course/courseitem.html'], function(template) {
       $el.data('courseId', this.model.get('id'));
       $el.html(this.template(this.model.toJSON()));
       return this;
+    },
+
+    updateCourseDetail: function() {
+      console.log(this);
+      window.c_app.views.coursedetailview.model.set(this.model.toJSON());
     }
   })
 

@@ -8,6 +8,7 @@ define(['views/course/courseitem'], function(CourseItemView) {
       window.console.log("INIT FIRED");
       this.collection = this.collection || {};
       this.collection.on('add', this.render, this);
+      this.render();
     },
 
     render: function() {
