@@ -2,7 +2,7 @@ require 'nokogiri'
 require 'open-uri'
 require 'json'
 require 'optparse'
-#require 'mysql2'
+require 'mysql2'
 
 # coursecode: span class='course-code'
 # coursetitle: span class='course-title'
@@ -14,11 +14,14 @@ def is_course_code(course_code)
   return !!(course_code =~ /^[0-9][A-Z][A-Z0-9][0-9]/i)
 end
 
+def parse_course_title(title)
+  return title.sub(/\{(.*?)\}/, '').strip
+end
+
 def parse_file(filename)
   f = File.open(filename)
   doc = Nokogiri::HTML(f)
   output = {}
-  puts doc.css('span.page-title').inspect
   output[:subject_name] = doc.css('span.page-title')[0].text
   output[:data] = []
 
@@ -68,7 +71,8 @@ end
 
 def parse_files_in_folder(folder_name)
   puts 'Starting parse on folder: ' + folder_name
-  #client = Mysql2::Client.new(:host => 'localhost', :username => 'root', :database => 'courselist')
+  client = Mysql2::Client.new(:host => 'localhost', :username => 'root', :database => 'coursesite')
+  subjects_added = []
 
   Dir.foreach(folder_name) do |file|
     next if file == '.' or file == '..'
@@ -82,10 +86,15 @@ def parse_files_in_folder(folder_name)
       result = client.query(q)
     end
 
-    q = "INSERT INTO subjects(subject_id, name)
-          VALUES('#{data_hash[:subject_code]', '#{data_hash[:subject_name]}'}"
+    if !subjects_added.include? course_info[:subject_code] then
+      title = (course_info[:subject_name].nil?)? '' : parse_course_title(client.escape(course_info[:subject_name]))
+      code = (course_info[:subject_code].nil?)? '' : client.escape(course_info[:subject_code])
+      q = "INSERT INTO subjects(subject_id, name) 
+            VALUES('#{code}', '#{title}')"
+      client.query(q)
+      subjects_added << course_info[:subject_code]
+    end
             
-    #course_db.collection('course_list').insert(course_info)
     puts 'Parsed and wrote to DB: ' + file_path
   end
 end
