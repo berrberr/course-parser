@@ -1,18 +1,16 @@
 define(['views/course/courseitem'], function(CourseItemView) {
-  var CourseListView = Backbone.View.extend({
+  var SubjectListView = Backbone.View.extend({
     el: '#course_list',
     tagName: 'ul',
     className: 'course-list',
 
     initialize: function() {
-      window.console.log("INIT FIRED");
       this.collection = this.collection || {};
       this.collection.on('add', this.render, this);
       this.render();
     },
 
     render: function() {
-      window.console.log("START REDNERING");
       var $el = $(this.el);
       var self = this;
 
@@ -26,5 +24,5 @@ define(['views/course/courseitem'], function(CourseItemView) {
     }
   });
 
-  return CourseListView;
+  return SubjectListView;
 });

@@ -1,16 +1,19 @@
 define([
   'models/course',
   'models/courselist',
-  'views/course/courselistview',
+  'models/subjectlist',
+  'views/course/subjectlistview',
   'views/course/coursedetailview'
 ],
 
-  function(Course, CourseList, CourseListView, CourseDetailView) {
+  function(Course, CourseList, SubjectList, SubjectListView, CourseDetailView) {
     var App = function() {
       console.log("APP FIRED");
       this.collections.courselist = new CourseList(
         [{'id': 'CS201', 'description': 'This is cs201'},{'id': 'CS222'},{'id': 'CS301'},{'id': 'CS333'}]);
-      this.views.courselistview = new CourseListView({ collection: this.collections.courselist });
+      this.collections.subjectlist = new SubjectList(
+        [{'code': 'CS', 'name': 'Computer Science'}, {'code': 'ANTHROP', 'name': 'Anthropology'}]);
+      this.views.subjectlistview = new SubjectListView({ collection: this.collections.courselist });
       this.views.coursedetailview = new CourseDetailView({ model: new Course({'id': 'Init View', 'description': 'Pick a course'}) });
     };
 

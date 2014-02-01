@@ -21,7 +21,7 @@ define(['text!templates/course/courseitem.html', 'views/course/coursedetailview'
 
     updateCourseDetail: function() {
       console.log(this);
-      window.c_app.views.coursedetailview.model.set(this.model.toJSON());
+      c_app.views.coursedetailview.model.set(this.model.toJSON());
     }
   })
 
