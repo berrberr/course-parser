@@ -14,7 +14,7 @@ define(['views/course/courseitem'], function(CourseItemView) {
       var $el = $(this.el);
       var self = this;
 
-      this.collection.each(function(course) {
+      _.each(this.collection, function(course) {
         var item;
         item = new CourseItemView({ model: course });
         $el.append(item.render().el);

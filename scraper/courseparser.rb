@@ -89,7 +89,7 @@ def parse_files_in_folder(folder_name)
     if !subjects_added.include? course_info[:subject_code] then
       title = (course_info[:subject_name].nil?)? '' : parse_course_title(client.escape(course_info[:subject_name]))
       code = (course_info[:subject_code].nil?)? '' : client.escape(course_info[:subject_code])
-      q = "INSERT INTO subjects(subject_id, name) 
+      q = "INSERT INTO subjects(subject_code, name) 
             VALUES('#{code}', '#{title}')"
       client.query(q)
       subjects_added << course_info[:subject_code]

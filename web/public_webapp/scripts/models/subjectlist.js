@@ -3,9 +3,14 @@ define(['models/subject'], function(Subject) {
     model: Subject,
 
     initialize: function() {
-      this.subject_code = this.subject_code || null;
-      this.course_list = window.c_app.collections.courselist.where({'subject_code': this.subject_code});
-      console.log('COURSE LIST:', this.course_list);
+      console.log(this);
+    },
+
+    addSubjects: function(subject_arr, courselist) {
+      var self = this;
+      _.each(subject_arr, function(subject) {
+        self.add(new Subject(subject, courselist));
+      })
     }
   });
 
