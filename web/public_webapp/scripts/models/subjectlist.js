@@ -1,6 +1,7 @@
 define(['models/subject'], function(Subject) {
   var SubjectList = Backbone.Collection.extend({
     model: Subject,
+    url: 'http://api.courses.dev/subject',
 
     initialize: function() {
       console.log(this);

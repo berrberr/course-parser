@@ -1,13 +1,26 @@
 define(function() {
   var Subject = Backbone.Model.extend({
-    defaults: {
+    url: function() {
+      return 'http://api.courses.dev/subject/courses/' + this.subject_code;
+    },
 
+    defaults: {
+      'subject_code': 'COMP SCI',
+      'name': 'Computer Science',
+      'course_list': []
     },
 
     // code, name, course_list
-    initialize: function(info, courselist) {
-      this.course_list = courselist.where({'subject_code': info.code});
+    initialize: function() {
+    },
+
+    getCourseList: function() {
+      var self = this;
+      this.fetch({success: function(collection) {
+        self.course_list = collection;
+      }});
     }
+
   })
 
   return Subject;

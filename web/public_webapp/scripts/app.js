@@ -25,11 +25,9 @@ define([
     ];
     var App = function() {
       this.collections.courselist = new CourseList(courses);
-      var subj = new Subject(subjects[0], this.collections.courselist);
       this.collections.subjectlist = new SubjectList();
-      this.collections.subjectlist.addSubjects(subjects, this.collections.courselist);
       console.log(this.collections.subjectlist);
-      this.views.subjectlistview = new SubjectListView({ collection: this.collections.subjectlist });
+      //this.views.subjectlistview = new SubjectListView({ collection: this.collections.subjectlist });
       this.views.coursedetailview = new CourseDetailView({ model: new Course({'id': 'Init View', 'description': 'Pick a course'}) });
     };
 

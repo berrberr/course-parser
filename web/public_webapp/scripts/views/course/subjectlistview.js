@@ -1,4 +1,4 @@
-define(['views/course/courseitem'], function(CourseItemView) {
+define(['views/course/subjectitemview'], function(SubjectItemView) {
   var SubjectListView = Backbone.View.extend({
     el: '#course_list',
     tagName: 'ul',
@@ -14,9 +14,9 @@ define(['views/course/courseitem'], function(CourseItemView) {
       var $el = $(this.el);
       var self = this;
 
-      _.each(this.collection, function(course) {
+      _.each(this.collection, function(subject) {
         var item;
-        item = new CourseItemView({ model: course });
+        item = new SubjectItemView({ model: subject });
         $el.append(item.render().el);
       });
 

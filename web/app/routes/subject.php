@@ -1,8 +1,8 @@
 <?php
 use RedBean_Facade as R;
 
-//GET api/subject/all
-$app->get('/subject/all', function() use ($app) {
+//GET api/subject
+$app->get('/subject', function() use ($app) {
   try {
     $subjects = R::find('subjects');
     if($subjects) {
@@ -10,26 +10,26 @@ $app->get('/subject/all', function() use ($app) {
       echo json_encode(R::exportAll($subjects));
     }
   } catch (Exception $e) {
-    $app->response->status(500);
+    echo_err('Query failed', 500);
   }
 });
 
-//GET api/subject/find/:id
-$app->get('/subject/find/:id', function($id) use ($app) {
+//GET api/subject/:id
+$app->get('/subject/:id', function($id) use ($app) {
   try {
     $subject = R::find('subjects', 'subject_code = "' . $id . '"');
     if($subject) {
       $app->response()->header('Content-Type', 'application/json');
       echo json_encode(R::exportAll($subject));
     } else {
-      $app->response->status(404);
-      echo '404: Subject not found';
+      echo_err('Subject not found', 404);
     }  } catch(Exception $e) {
-    $app->response->status(500);
+    echo_err('Query failed', 500);
   }
 });
 
 //GET api/subject/courses/:id
+//@return array of courses in subject
 $app->get('/subject/courses/:id', function($id) use ($app) {
   try {
     $subject = R::find('subjects', 'subject_code = "' . $id . '"');
@@ -38,12 +38,13 @@ $app->get('/subject/courses/:id', function($id) use ($app) {
       if($courses) {
         $app->response()->header('Content-Type', 'application/json');
         echo json_encode(R::exportAll($courses));
+      } else {
+        echo_err('Subject has no courses', 404);
       }
     } else {
-      $app->response->status(404);
-      echo '404: Subject not found';
+      echo_err('Subject not found', 404);
     }  } catch(Exception $e) {
-    $app->response->status(500);
+    echo_err('Query failed', 500);
   }
 });
 

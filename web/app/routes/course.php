@@ -6,8 +6,8 @@ $app->get('/', function () use ($app) {
 });
 
 
-//GET api/course/all
-$app->get('/course/all', function() use ($app) {
+//GET api/course
+$app->get('/course', function() use ($app) {
   try {
     $courses = R::find('courses');
     if($courses) {
@@ -19,8 +19,8 @@ $app->get('/course/all', function() use ($app) {
   }
 });
 
-//GET api/course/find/:id
-$app->get('/course/find/:id', function($id) use ($app) {
+//GET api/course/:id
+$app->get('/course/:id', function($id) use ($app) {
   try {
     $course = R::find('courses', 'code = "' . $id . '"');
     if($course) {
