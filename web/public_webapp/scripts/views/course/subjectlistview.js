@@ -1,4 +1,4 @@
-define(['views/course/subjectitemview'], function(SubjectItemView) {
+define(['views/course/subjectitemview', 'models/subject'], function(SubjectItemView, Subject) {
   var SubjectListView = Backbone.View.extend({
     el: '#course_list',
     tagName: 'ul',
@@ -6,7 +6,6 @@ define(['views/course/subjectitemview'], function(SubjectItemView) {
 
     initialize: function() {
       this.collection = this.collection || {};
-      this.collection.on('add', this.render, this);
       this.render();
     },
 
@@ -14,11 +13,19 @@ define(['views/course/subjectitemview'], function(SubjectItemView) {
       var $el = $(this.el);
       var self = this;
 
-      _.each(this.collection, function(subject) {
-        var item;
-        item = new SubjectItemView({ model: subject });
-        $el.append(item.render().el);
-      });
+      this.collection.fetch()
+        .done(function(collection, response) {
+          _.each(collection, function(subject) {
+            var item = new SubjectItemView({ model: new Subject(subject) });
+            $el.append(item.render().el);
+          });
+        });
+
+      // _.each(this.collection, function(subject) {
+      //   var item;
+      //   item = new SubjectItemView({ model: subject });
+      //   $el.append(item.render().el);
+      // });
 
       return this;
     }

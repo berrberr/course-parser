@@ -4,7 +4,7 @@ define(['models/subject'], function(Subject) {
     url: 'http://api.courses.dev/subject',
 
     initialize: function() {
-      console.log(this);
+      console.log("SUBJECT COLLECTION INIT:", this);
     },
 
     addSubjects: function(subject_arr, courselist) {

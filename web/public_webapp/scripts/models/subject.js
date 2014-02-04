@@ -1,7 +1,7 @@
 define(function() {
   var Subject = Backbone.Model.extend({
     url: function() {
-      return 'http://api.courses.dev/subject/courses/' + this.subject_code;
+      return 'http://api.courses.dev/subject/courses/' + this.get('subject_code');
     },
 
     defaults: {
