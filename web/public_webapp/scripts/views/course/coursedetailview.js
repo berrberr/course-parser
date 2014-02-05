@@ -1,6 +1,6 @@
 define(['text!templates/course/coursedetail.html'], function(template) {
   var CourseDetailView = Backbone.View.extend({
-    el: '#course_details',
+    el: '#course-details',
     template: _.template(template),
 
     initialize: function() {

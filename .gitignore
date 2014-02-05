@@ -1,3 +1,4 @@
 web/app/vendor/*
 web/node_modules/*
 web/lib/*
+scraper/pages/*

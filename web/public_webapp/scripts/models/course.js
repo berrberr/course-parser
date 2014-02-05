@@ -1,7 +1,7 @@
 define(function() {
   var Course = Backbone.Model.extend({
     defaults: {
-      'id': 'CS 101',
+      'code': 'CS 101',
       'name': 'CS Intro 1',
       'description': 'This is cs intro 1',
       'subject_code': 'CS'

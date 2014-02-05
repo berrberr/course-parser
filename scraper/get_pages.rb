@@ -17,10 +17,12 @@ module Pages
 
   def self.download_pages
     timestamp = Time.now.strftime('%d%m%Y-%H%M')
+    i = 0
     get_links.each do |page|
+      i = i + 1
       url = @base_url + page
-      File.write(@pages_dir + timestamp + '-' + page, open(url).read)
-      puts 'Saved: ' + url
+      File.write(@pages_dir + timestamp + '/' + page, open(url).read)
+      puts 'Saved: ' + url + ' Pagenum: ' + i.to_s
     end
   end
 end

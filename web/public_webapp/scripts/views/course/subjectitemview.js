@@ -1,7 +1,5 @@
-define(['text!templates/course/subjectitem.html', 'models/course', 'views/course/courseitem'], function(template, Course, CourseItemView) {
+define(['text!templates/course/subjectitem.html', 'models/course', 'views/course/courseitemview'], function(template, Course, CourseItemView) {
   var SubjectItemView = Backbone.View.extend({
-    tagName: 'li',
-    className: 'subject-item',
     template: _.template(template),
 
     events: {
@@ -21,9 +19,10 @@ define(['text!templates/course/subjectitem.html', 'models/course', 'views/course
     //Add a sibling div containing a ul with each li being a courseitemview
     showSubjectCourses: function() {
       //console.log(this.model);
+      event.preventDefault();
       var $el = $(this.el);
-      $el.after('<div id="course_leaf"><ul></ul></div>');
-      $el = $('#course_leaf');
+      $el.after('<div id="course-leaf" class="list-group"></div>');
+      $el = $('#course-leaf');
       this.model.fetch()
         .done(function(collection, response) {
           _.each(collection, function(course) {

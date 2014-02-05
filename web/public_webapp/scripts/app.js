@@ -30,7 +30,7 @@ define([
       //   console.log("CALLBACK:", this.collections.subjectlist);
       // }});
       this.views.subjectlistview = new SubjectListView({ collection: this.collections.subjectlist });
-      this.views.coursedetailview = new CourseDetailView({ model: new Course({'id': 'Init View', 'description': 'Pick a course'}) });
+      this.views.coursedetailview = new CourseDetailView({ model: new Course({'code': 'Init View', 'description': 'Pick a course'}) });
     };
 
     App.prototype = {

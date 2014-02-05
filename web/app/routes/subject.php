@@ -4,7 +4,7 @@ use RedBean_Facade as R;
 //GET api/subject
 $app->get('/subject', function() use ($app) {
   try {
-    $subjects = R::find('subjects');
+    $subjects = R::find('subjects', ' ORDER BY name');
     if($subjects) {
       $app->response->header('Content-Type', 'application/json');
       echo json_encode(R::exportAll($subjects));
