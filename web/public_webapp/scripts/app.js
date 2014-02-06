@@ -9,13 +9,13 @@ define([
 
   function(Course, CourseList, SubjectList, Subject, SubjectListView, CourseDetailView) {
     var courses = [
-    {'id': 'CS111', 'description': 'CS 111 class', 'name': 'Intro to CS 1', 'subject_code': 'CS'},
-    {'id': 'CS222', 'description': 'CS 222 class', 'name': '2nd Intro to CS', 'subject_code': 'CS'},
-    {'id': 'CS 3333', 'description': 'Class for CS 333', 'name': 'Data structures and algs', 'subject_code': 'CS'},
+    {'id': 'CS111', 'description': 'CS 111 class', 'title': 'Intro to CS 1', 'subject_code': 'CS'},
+    {'id': 'CS222', 'description': 'CS 222 class', 'title': '2nd Intro to CS', 'subject_code': 'CS'},
+    {'id': 'CS 3333', 'description': 'Class for CS 333', 'title': 'Data structures and algs', 'subject_code': 'CS'},
 
-    {'id': 'ANTH1', 'description': 'Anthropology class 1', 'name': 'Intro to Anthropology', 'subject_code': 'ANTHROP'},
-    {'id': 'ANTH2', 'description': 'Anthropology class 2', 'name': 'Intro to Anthropology', 'subject_code': 'ANTHROP'},
-    {'id': 'ANTH3', 'description': 'Anthropology class 3', 'name': 'Intro to Anthropology', 'subject_code': 'ANTHROP'}
+    {'id': 'ANTH1', 'description': 'Anthropology class 1', 'title': 'Intro to Anthropology', 'subject_code': 'ANTHROP'},
+    {'id': 'ANTH2', 'description': 'Anthropology class 2', 'title': 'Intro to Anthropology', 'subject_code': 'ANTHROP'},
+    {'id': 'ANTH3', 'description': 'Anthropology class 3', 'title': 'Intro to Anthropology', 'subject_code': 'ANTHROP'}
     ];
 
     var subjects = [
@@ -31,6 +31,14 @@ define([
       // }});
       this.views.subjectlistview = new SubjectListView({ collection: this.collections.subjectlist });
       this.views.coursedetailview = new CourseDetailView({ model: new Course({'code': 'Init View', 'description': 'Pick a course'}) });
+      var options = {
+        keys: ['title', 'code']
+      }
+      var f = new Fuse(this.collections.courselist.toJSON(), options);
+      console.log(this.collections.courselist.toJSON());
+      var res = f.search('CS');
+      this.views.subjectlistview.render(res);
+
     };
 
     App.prototype = {

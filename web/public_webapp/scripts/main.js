@@ -13,8 +13,11 @@ requirejs.config({
       deps: ['vendor/underscore/underscore'],
       exports: 'Backbone'
     },
+    'vendor/fusejs/fuse': {
+      exports: 'Fuse'
+    },
     'app': {
-      deps: ['vendor/underscore/underscore', 'vendor/backbone/backbone']
+      deps: ['vendor/underscore/underscore', 'vendor/backbone/backbone', 'vendor/fusejs/fuse']
     }
   }
 });

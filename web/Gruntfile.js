@@ -59,6 +59,11 @@ module.exports = function (grunt) {
             nonnull: true,
             src: 'lib/bootstrap/dist/js/bootstrap.js',
             dest: 'public_webapp/scripts/vendor/bootstrap/bootstrap.js'
+          },
+          {
+            nonnull: true,
+            src: 'lib/fuse.js/fuse.js',
+            dest: 'public_webapp/scripts/vendor/fusejs/fuse.js'
           }
         ]
       }
