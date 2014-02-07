@@ -5954,13 +5954,16 @@ td.visible-print {
     display: none !important;
   }
 }
-.main_container {
+.main-container {
   margin-left: 0px;
-  margin-top: 20px;
+  margin-top: 25px;
 }
-.course_list {
+.course-list {
   float: left;
 }
-.course_details {
+.course-details {
   float: left;
+}
+.subtree {
+  float: right;
 }
