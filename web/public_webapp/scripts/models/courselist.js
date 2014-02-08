@@ -4,14 +4,7 @@ define(['models/course'], function(Course) {
     url: 'http://api.courses.dev/course',
 
     initialize: function() {
-      var self = this;
-      this.ready = false;
-      this.fetch()
-        .done(function(collection) {
-          console.log('FETCH: ', collection);
-          self.collection = collection;
-          self.ready = true;
-        });
+      this.deferred = this.fetch();
     }
   });
   
