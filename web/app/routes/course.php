@@ -29,10 +29,27 @@ $app->get('/course/:id', function($id) use ($app) {
     } else {
       $app->response->status(404);
       echo '404: Course not found';
-    }  } catch(Exception $e) {
+    }  
+  } catch(Exception $e) {
     $app->response->status(500);
   }
 });
 
+//Full text search on courses
+//GET api/course/search/:query
+$app->get('/course/search/:query', function($query) use ($app) {
+  try {
+    $results = R::getAll('SELECT * FROM courses WHERE MATCH(title, description) AGAINST("' . $query . '");');
+    if($results) {
+      $app->response->header('Content-Type', 'application/json');
+      echo json_encode($results);
+    } else {
+      echo_err('No results found', 404);
+    }
+  } catch(Exception $e) {
+    echo_err('Query failed', $e);
+    echo('SELECT * FROM courses WHERE MATCH(title, description) AGAINST("' . $query . '")');
+  }
+});
 
 ?>
