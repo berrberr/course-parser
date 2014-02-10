@@ -28,22 +28,24 @@ define([
 
       this.collections.courselist = new CourseList();
       this.collections.subjectlist = new SubjectList();
-      // this.collections.subjectlist.fetch({success: function() {
-      //   console.log("CALLBACK:", this.collections.subjectlist);
-      // }});
       this.views.subjectlistview = new SubjectListView({ collection: this.collections.subjectlist });
       this.views.coursedetailview = new CourseDetailView({ model: new Course({'code': 'Init View', 'description': 'Pick a course'}) });
-      this.collections.courselist.deferred.done(function() {
-        console.log('FETHCED: ', self.collections.courselist.toJSON());
-        var options = {
-          keys: ['title', 'code'],
-          threshold: 0.4
-        }
-        var f = new Fuse(self.collections.courselist.toJSON(), options);
-        var res = f.search('algorithm');
-        console.log('SEARCH RESULTS', res);
-        self.views.subjectlistview.render(res);
-      });
+      // this.collections.courselist.deferred.done(function() {
+      //   console.log('FETHCED: ', self.collections.courselist.toJSON());
+      //   var options = {
+      //     keys: ['title', 'code'],
+      //     threshold: 0.4
+      //   }
+      //   var f = new Fuse(self.collections.courselist.toJSON(), options);
+      //   var res = f.search('algorithm');
+      //   console.log('SEARCH RESULTS', res);
+      //   self.views.subjectlistview.render(res);
+      // });
+      // $.when(this.collections.courselist.search('algorithms')).done(function() {
+      //   console.log(self.collections.courselist);
+      //   self.views.subjectlistview.render(self.collections.courselist.toJSON());
+      // });
+      this.collections.courselist.search('algorithms', this.views.subjectlistview);
 
 
     };
