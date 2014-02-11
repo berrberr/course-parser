@@ -1,5 +1,5 @@
 define(['models/course'], function(Course) {
-  var CourseList = Backbone.Collection.extend({
+  var CourseSearch = Backbone.Collection.extend({
     model: Course,
     url: function() {
       return 'http://api.courses.dev/course/search/' + this.query;
@@ -7,6 +7,10 @@ define(['models/course'], function(Course) {
 
     initialize: function() {
       //this.deferred = this.fetch();
+    },
+
+    setQuery: function(query) {
+      this.query = query;
     },
 
     search: function(query, view) {
@@ -21,5 +25,5 @@ define(['models/course'], function(Course) {
     }
   });
   
-  return CourseList;
+  return CourseSearch;
 });

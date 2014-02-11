@@ -1,13 +1,14 @@
 define([
   'models/course',
-  'models/courselist',
+  'models/coursesearch',
   'models/subjectlist',
   'models/subject',
   'views/course/subjectlistview',
-  'views/course/coursedetailview'
+  'views/course/coursedetailview',
+  'views/course/searchview'
 ],
 
-  function(Course, CourseList, SubjectList, Subject, SubjectListView, CourseDetailView) {
+  function(Course, CourseSearch, SubjectList, Subject, SubjectListView, CourseDetailView, SearchView) {
     var courses = [
     {'id': 'CS111', 'description': 'CS 111 class', 'title': 'Intro to CS 1', 'subject_code': 'CS'},
     {'id': 'CS222', 'description': 'CS 222 class', 'title': '2nd Intro to CS', 'subject_code': 'CS'},
@@ -26,10 +27,11 @@ define([
     var App = function() {
       var self = this;
 
-      this.collections.courselist = new CourseList();
+      this.collections.coursesearch = new CourseSearch();
       this.collections.subjectlist = new SubjectList();
       this.views.subjectlistview = new SubjectListView({ collection: this.collections.subjectlist });
       this.views.coursedetailview = new CourseDetailView({ model: new Course({'code': 'Init View', 'description': 'Pick a course'}) });
+      this.views.searchview = new SearchView();
       // this.collections.courselist.deferred.done(function() {
       //   console.log('FETHCED: ', self.collections.courselist.toJSON());
       //   var options = {
@@ -45,7 +47,7 @@ define([
       //   console.log(self.collections.courselist);
       //   self.views.subjectlistview.render(self.collections.courselist.toJSON());
       // });
-      this.collections.courselist.search('algorithms', this.views.subjectlistview);
+      this.collections.coursesearch.search('algorithms', this.views.subjectlistview);
 
 
     };
