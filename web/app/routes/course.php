@@ -52,4 +52,21 @@ $app->get('/course/search/:query', function($query) use ($app) {
   }
 });
 
+//Simple search on courses for autocomplete
+//GET api/course/search/:query
+$app->get('/course/autocomplete/:query', function($query) use ($app) {
+  try {
+    $results = R::getAll('SELECT * FROM courses WHERE title LIKE "%' . $query . '%" OR code LIKE "%' . $query . '%"');
+    if($results) {
+      $app->response->header('Content-Type', 'application/json');
+      echo json_encode($results);
+    } else {
+      echo_err('No results found', 404);
+    }
+  } catch(Exception $e) {
+    echo_err('Query failed', $e);
+    echo('SELECT * FROM courses WHERE MATCH(title, description) AGAINST("' . $query . '")');
+  }
+});
+
 ?>

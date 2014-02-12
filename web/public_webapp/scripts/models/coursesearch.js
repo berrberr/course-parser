@@ -2,7 +2,7 @@ define(['models/course'], function(Course) {
   var CourseSearch = Backbone.Collection.extend({
     model: Course,
     url: function() {
-      return 'http://api.courses.dev/course/search/' + this.query;
+      return 'http://api.courses.dev/course/autocomplete/' + this.query;
     },
 
     initialize: function() {
@@ -19,7 +19,7 @@ define(['models/course'], function(Course) {
       this.fetch()
         .done(function(collection, response) {
            this.results = collection;
-           if(view !== null) view.render(collection);
+           //if(view !== null) view.render(collection);
            console.log('SEARCH: ', view);
         });
     }
