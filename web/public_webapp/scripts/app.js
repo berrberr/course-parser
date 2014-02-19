@@ -5,10 +5,13 @@ define([
   'models/subject',
   'views/course/subjectlistview',
   'views/course/coursedetailview',
-  'views/course/searchview'
+  'views/course/searchview',
+  'models/tree/tree',
+  'models/tree/treenode',
+  'views/tree/treenodeview'
 ],
 
-  function(Course, CourseSearch, SubjectList, Subject, SubjectListView, CourseDetailView, SearchView) {
+  function(Course, CourseSearch, SubjectList, Subject, SubjectListView, CourseDetailView, SearchView, Tree, TreeNode, TreeNodeView) {
     var courses = [
     {'id': 'CS111', 'description': 'CS 111 class', 'title': 'Intro to CS 1', 'subject_code': 'CS'},
     {'id': 'CS222', 'description': 'CS 222 class', 'title': '2nd Intro to CS', 'subject_code': 'CS'},
@@ -47,6 +50,12 @@ define([
       //   console.log(self.collections.courselist);
       //   self.views.subjectlistview.render(self.collections.courselist.toJSON());
       // });
+var tn1 = new TreeNode({'title': 'TN1'});
+      var x = new TreeNodeView({model: tn1});
+var tn2 = new TreeNode({'title': 'TN2'});
+      var y = new TreeNodeView({model: tn2});
+      x.render();
+      y.render();
       this.collections.coursesearch.search('algorithms', this.views.subjectlistview);
 
 
