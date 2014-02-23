@@ -27,8 +27,7 @@ $app->get('/course/:id', function($id) use ($app) {
       $app->response()->header('Content-Type', 'application/json');
       echo json_encode(R::exportAll($course));
     } else {
-      $app->response->status(404);
-      echo '404: Course not found';
+      echo_err('Course not found', 404);
     }  
   } catch(Exception $e) {
     $app->response->status(500);
@@ -57,12 +56,8 @@ $app->get('/course/search/:query', function($query) use ($app) {
 $app->get('/course/autocomplete/:query', function($query) use ($app) {
   try {
     $results = R::getAll('SELECT * FROM courses WHERE title LIKE "%' . $query . '%" OR code LIKE "%' . $query . '%"');
-    if($results) {
-      $app->response->header('Content-Type', 'application/json');
-      echo json_encode($results);
-    } else {
-      echo_err('No results found', 404);
-    }
+    $app->response->header('Content-Type', 'application/json');
+    echo json_encode($results);
   } catch(Exception $e) {
     echo_err('Query failed', $e);
     echo('SELECT * FROM courses WHERE MATCH(title, description) AGAINST("' . $query . '")');

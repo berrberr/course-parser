@@ -1,22 +1,33 @@
 define(['models/tree/treenode'], function(TreeNode) {
   var TreeNodeView = Backbone.View.extend({
     template: _.template(
-      '<a href="#" class="list-group-item">Title: <%= title %></a>'
+      '<div class="col-sm-12"><a href="#" class="list-group-item">Title: <%= title %></a></div>'
     ),
-    el: '#tree',
+
+    childTemplate: _.template(
+      '<div class="col-sm-11"><a href="#" class="list-group-item">Title: <%= title %></a></div>'
+    ),
+
+    tagName: 'div',
+    parentEl: null,
 
     events: {
       'click': 'toggleTreeNode'
     },
 
+    initialize: function() {
+    },
+
     render: function() {
-      var $el = $(this.el);
-      $el.append(this.template(this.model.toJSON()));
+      $(this.el).html(this.template(this.model.toJSON()));
       return this;
     },
 
     toggleTreeNode: function(e) {
-      console.log(this.model.toJSON());
+      event.preventDefault();
+      $(this.el).append(this.childTemplate({title: "test"}));
+      console.log('you clicked:', this.model.toJSON());
+      console.log(e.target);
     }
   });
 
