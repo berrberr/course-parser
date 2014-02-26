@@ -1,11 +1,13 @@
 @section('tree')
 
   <div class="list-group">
-    <a href="#" class="list-group-item">Item 1</a>
-    <a href="#" class="list-group-item">Item 2</a>
-    <a href="#" class="list-group-item">Item 3</a>
-    @foreach($tree as $node)
-      <a href="#" class="list-group-item">{{ $node["title"] }}</a>
+    @foreach($tree as $subject)
+      <div class="col-sm-12"><a href="#" class="list-group-item subject-node">{{ $subject->name }}</a></div>
+      <div class="col-sm-11 course-nodes">
+        @foreach($subject->courses as $course)
+          <a href="#" class="list-group-item course-node">{{ $course->code }}: {{ $course->title }}</a>
+        @endforeach
+      </div>
     @endforeach
   </div>
 

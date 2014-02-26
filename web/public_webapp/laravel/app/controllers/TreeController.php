@@ -2,12 +2,14 @@
 
 class TreeController extends BaseController {
   
-  public static function getTree() {
-    return [
-    ["title" => "node1"],
-    ["title" => "node2"],
-    ["title" => "node3"]];
+  public $subject;
+
+  public function __construct() {
+    $this->subject = new Subject();
+  }
+
+
+  public function getTree() {
+    return $this->subject->getAll();
   }
 }
-
-?>

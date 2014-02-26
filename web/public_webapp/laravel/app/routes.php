@@ -13,8 +13,8 @@
 
 Route::get('/', function()
 {
-  $tree = TreeController::getTree();
-	return View::make('home')->with('tree', $tree);
+  $tree = new TreeController;
+	return View::make('home')->with('tree', $tree->getTree());
 });
 
 Route::get('/courses', function()
