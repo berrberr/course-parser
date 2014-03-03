@@ -17,6 +17,10 @@ Route::get('/', function()
 	return View::make('home')->with('tree', $tree->getTree());
 });
 
+Route::get('/course/{subject_code}/{course_code}', array('as' => 'course', function($subject_code, $course_code) {
+  return 'hi';
+}));
+
 Route::get('/courses', function()
 {
   $c = new Course();

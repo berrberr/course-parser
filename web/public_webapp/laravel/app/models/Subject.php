@@ -5,7 +5,7 @@ class Subject extends Eloquent {
   protected $table = 'subjects';
 
   public function getAll() {
-    return Subject::all();
+    return Subject::orderBy('name', 'asc')->get();
   }
 
   public function getSubjectByCode($subject_code) {

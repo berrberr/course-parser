@@ -2,13 +2,18 @@
 
   <div class="list-group">
     @foreach($tree as $subject)
-      <div class="col-sm-12"><a href="#" class="list-group-item subject-node">{{ $subject->name }}</a></div>
-      <div class="col-sm-11 course-nodes">
-        @foreach($subject->courses as $course)
-          <a href="#" class="list-group-item course-node">{{ $course->code }}: {{ $course->title }}</a>
-        @endforeach
+      <div class="col-sm-12" id="{{ $subject->subject_code }}">
+        <a href="#" class="list-group-item subject-node">{{ $subject->name }}</a>
+        <div class="col-sm-11 course-nodes">
+          @foreach($subject->courses as $course)
+            {{ link_to_route('course', 
+                              $course->code . ': ' . $course->title, 
+                              [$course->subject_code, $course->code], 
+                              array('class' => 'list-group-item course-node'))}}
+          @endforeach
+        </div>
       </div>
-    @endforeach
+      @endforeach
   </div>
 
 @endsection
