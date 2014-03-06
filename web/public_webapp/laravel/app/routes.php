@@ -18,8 +18,15 @@ Route::get('/', function()
 });
 
 Route::get('/course/{subject_code}/{course_code}', array('as' => 'course', function($subject_code, $course_code) {
-  return 'hi';
+  return 'COURSE VIEW';
 }));
+
+Route::get('/subject/{subject_code}', array(
+  'as' => 'subject',
+  function($subject_code) {
+    //return View::make('subject')->with();
+  })
+);
 
 Route::get('/courses', function()
 {
@@ -27,5 +34,4 @@ Route::get('/courses', function()
   $course = $c->getCourseByCodeSubject('1AA3', 'ANTHROP');
   echo $course->description;
   //echo $c->getCoursesBySubject('COMP SCI');
-
 });
