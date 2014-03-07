@@ -3,7 +3,8 @@
 class Subject extends Eloquent {
 
   protected $table = 'subjects';
-
+  protected $primaryKey = 'subject_code';
+  
   public function getAll() {
     return Subject::orderBy('name', 'asc')->get();
   }

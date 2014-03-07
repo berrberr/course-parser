@@ -23,9 +23,7 @@ Route::get('/course/{subject_code}/{course_code}', array('as' => 'course', funct
 
 Route::get('/subject/{subject_code}', array(
   'as' => 'subject',
-  function($subject_code) {
-    //return View::make('subject')->with();
-  })
+  'uses' => 'SubjectController@getSubject')
 );
 
 Route::get('/courses', function()
