@@ -21,6 +21,12 @@ Route::get('/course/{subject_code}/{course_code}', array('as' => 'course', funct
   return 'COURSE VIEW';
 }));
 
+//All subject page home
+Route::get('/subject', function() {
+  return View::make('subjecthome');
+});
+
+//Subject course view
 Route::get('/subject/{subject_code}', array(
   'as' => 'subject',
   'uses' => 'SubjectController@getSubject')

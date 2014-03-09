@@ -6,3 +6,17 @@
   float: right;
   display: none;
 }
+
+.course-list-title {
+  text-decoration: none;
+  color: black;
+}
+
+.course-list-description {
+  margin-top: 1em;
+}
+
+.course-time,
+.course-instructor {
+  margin-top: 1em;
+}

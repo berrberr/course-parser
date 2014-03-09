@@ -12,4 +12,3 @@
 //
 //= require jquery
 //= require tree
-//= require_tree .
