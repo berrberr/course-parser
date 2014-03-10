@@ -9,7 +9,8 @@ class TreeController extends BaseController {
   }
 
 
-  public function getTree() {
-    return $this->subject->getAll();
+  public static function getTree() {
+    $subject = new Subject();
+    return $subject->getAll();
   }
 }

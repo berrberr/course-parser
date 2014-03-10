@@ -13,8 +13,7 @@
 
 Route::get('/', function()
 {
-  $tree = new TreeController;
-	return View::make('home')->with('tree', $tree->getTree());
+	return View::make('home')->with('tree', TreeController::getTree());
 });
 
 Route::get('/course/{subject_code}/{course_code}', array('as' => 'course', function($subject_code, $course_code) {
@@ -23,7 +22,7 @@ Route::get('/course/{subject_code}/{course_code}', array('as' => 'course', funct
 
 //All subject page home
 Route::get('/subject', function() {
-  return View::make('subjecthome');
+  return View::make('subjecthome')->with('tree', TreeController::getTree());
 });
 
 //Subject course view
