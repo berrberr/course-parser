@@ -16,9 +16,18 @@ Route::get('/', function()
 	return View::make('home')->with('tree', TreeController::getTree());
 });
 
-Route::get('/course/{subject_code}/{course_code}', array('as' => 'course', function($subject_code, $course_code) {
-  return 'COURSE VIEW';
-}));
+//Single course view
+Route::get('/course/{subject_code}/{course_code}', array(
+  'as' => 'course', 
+  function($subject_code, $course_code) {
+    $course = Course::getCourseByCodeSubject($course_code, $subject_code);
+    if(isset($course)) {
+      return View::make('course')->with('course', $course);
+    } else {
+      return View::make('course')->with('error', 404);
+    }
+  })
+);
 
 //All subject page home
 Route::get('/subject', function() {
@@ -31,10 +40,3 @@ Route::get('/subject/{subject_code}', array(
   'uses' => 'SubjectController@getSubject')
 );
 
-Route::get('/courses', function()
-{
-  $c = new Course();
-  $course = $c->getCourseByCodeSubject('1AA3', 'ANTHROP');
-  echo $course->description;
-  //echo $c->getCoursesBySubject('COMP SCI');
-});

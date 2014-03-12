@@ -11,5 +11,5 @@
  *
  *= require_tree .
  *= require bootstrap.min.css
- *= require main.scss.css
+ *= require main.scss
  */

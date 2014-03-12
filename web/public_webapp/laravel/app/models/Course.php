@@ -4,7 +4,7 @@ class Course extends Eloquent {
 
   protected $table = 'courses';
 
-  public function getCourseByCodeSubject($code, $subject_code) {
+  public static function getCourseByCodeSubject($code, $subject_code) {
     return Course::where('code', '=', $code)->where('subject_code', '=', $subject_code)->first();
   }
 
