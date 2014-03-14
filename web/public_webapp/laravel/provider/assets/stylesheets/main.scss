@@ -22,7 +22,17 @@
 }
 
 .course-table {
+  tr:first-child td {
+    border-top: 0;
+  }
+  
   .course-table-title {
     font-weight: bold;
+  }
+}
+
+.course-panel {
+  .panel-body {
+    padding-bottom: 0;
   }
 }

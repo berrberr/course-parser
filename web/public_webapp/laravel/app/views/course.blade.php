@@ -10,7 +10,7 @@
           [$course->subject_code],
           array('class' => '')
       )}}
-      <div class="panel panel-primary">
+      <div class="panel panel-primary course-panel">
         <div class="panel-heading">
           <h3 class="panel-title">Course Info</h3>
         </div>
@@ -29,11 +29,36 @@
                 <td class="course-table-title">Description:</td>
                 <td class="course-table-content">{{ $course->description }}</td>
               </tr>
+              @if(!empty($course->prereq))
+                <tr>
+                  <td class="course-table-title">Prerequisites:</td>
+                  <td class="course-table-content">{{ $course->prereq }}</td>
+                </tr>
+              @endif
+              @if(!empty($course->antireq))
+                <tr>
+                  <td class="course-table-title">Antirequisites:</td>
+                  <td class="course-table-content">{{ $course->antireq }}</td>
+                </tr>
+              @endif
+              @if(!empty($course->crosslist))
+                <tr>
+                  <td class="course-table-title">Crosslist:</td>
+                  <td class="course-table-content">{{ $course->crosslist }}</td>
+                </tr>
+              @endif
             </tbody>
           </table>
         </div>
       </div>
-      
+      <div class="panel panel-primary course-panel">
+        <div class="panel-heading">
+          <h3 class="panel-title">Timetable</h3>
+        </div>
+        <div class="panel-body">
+          
+        </div>
+      </div>
       
     </div>
   </div>
