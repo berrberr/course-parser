@@ -18,11 +18,14 @@ def parse_course_title(title)
   return title.sub(/\{(.*?)\}/, '').strip
 end
 
+TimeFmtStr = "%Y-%m-%d %H:%M:%S"
+
 def parse_file(filename)
   f = File.open(filename)
   doc = Nokogiri::HTML(f)
   output = {}
-  output[:subject_name] = doc.css('span.page-title')[0].text
+
+  if !doc.css('span.page-title')[0].nil? then output[:subject_name] = doc.css('span.page-title')[0].text end
   output[:data] = []
 
   doc.css('div.item-container').each do |coursebox|
@@ -80,19 +83,23 @@ def parse_files_in_folder(folder_name)
     course_info = parse_file(file_path)
     data_hash = course_info[:data]
     data_hash.each do |dh|
+      timestamp = Time.now.strftime(TimeFmtStr)
       dh.each { |k, v| dh[k] = client.escape(v.to_s) }
-      q = "INSERT INTO courses(code, subject_code, title, description, prereq, antireq, crosslist)
-            VALUES('#{dh[:code]}', '#{dh[:subject_code]}', '#{dh[:title]}', '#{dh[:description]}', '#{dh[:prereq]}', '#{dh[:antireq]}', '#{dh[:crosslist]}')"
+      q = "INSERT INTO courses(course_code, subject_code, title, description, prereq, antireq, crosslist, created_at, updated_at)
+            VALUES('#{dh[:code]}', '#{dh[:subject_code]}', '#{dh[:title]}', '#{dh[:description]}', '#{dh[:prereq]}', '#{dh[:antireq]}', '#{dh[:crosslist]}', '#{timestamp}', '#{timestamp}')"
       result = client.query(q)
     end
 
     if !subjects_added.include? course_info[:subject_code] then
+      timestamp = Time.now.strftime(TimeFmtStr)
       title = (course_info[:subject_name].nil?)? '' : parse_course_title(client.escape(course_info[:subject_name]))
       code = (course_info[:subject_code].nil?)? '' : client.escape(course_info[:subject_code])
-      q = "INSERT INTO subjects(subject_code, name) 
-            VALUES('#{code}', '#{title}')"
-      client.query(q)
-      subjects_added << course_info[:subject_code]
+      q = "INSERT INTO subjects(subject_code, name, created_at, updated_at) 
+            VALUES('#{code}', '#{title}', '#{timestamp}', '#{timestamp}')"
+      if code.present? then
+        client.query(q)
+        subjects_added << course_info[:subject_code]
+      end
     end
             
     puts 'Parsed and wrote to DB: ' + file_path

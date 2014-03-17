@@ -19,7 +19,7 @@
             <tbody>
               <tr>
                 <td class="course-table-title">Code:</td>
-                <td class="course-table-content">{{ $course->code }}</td>
+                <td class="course-table-content">{{ $course->course_code }}</td>
               </tr>
               <tr>
                 <td class="course-table-title">Title:</td>

@@ -13,13 +13,16 @@ class CreateCoursesTable extends Migration {
     {
         Schema::create('courses', function($table) {
             $table->increments('id');
-            $table->string('code', 16)->nullable();
+            $table->string('course_code', 16)->nullable();
             $table->string('subject_code', 16)->nullable();
-            $table->string('title', 256)->nullable()->index();
+            $table->string('title', 255)->nullable()->index();
             $table->text('description')->nullable();
             $table->text('prereq')->nullable();
             $table->text('antireq')->nullable();
             $table->text('crosslist')->nullable();
+            $table->timestamp('created_at')->default("0000-00-00 00:00:00");
+            $table->timestamp('updated_at')->default("0000-00-00 00:00:00");
+
         });
     }
 

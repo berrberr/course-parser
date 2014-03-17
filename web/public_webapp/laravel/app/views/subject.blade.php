@@ -17,14 +17,14 @@
                 <div class="row">
                   <div class="col-xs-2 col-sm-1">
                     {{ link_to_route('course', 
-                        $course->code, 
-                        [$course->subject_code, $course->code],
+                        $course->course_code, 
+                        [$course->subject_code, $course->course_code],
                         array('class' => 'course-list-title'))}}
                   </div> 
                   <div class="col-xs-11">
                     {{ link_to_route('course', 
                         $course->title, 
-                        [$course->subject_code, $course->code],
+                        [$course->subject_code, $course->course_code],
                         array('class' => 'course-list-title'))}}
                   </div>
                   <div class="col-xs-12 course-list-description">

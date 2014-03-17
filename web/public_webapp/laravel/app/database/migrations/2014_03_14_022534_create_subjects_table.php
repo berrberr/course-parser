@@ -14,7 +14,10 @@ class CreateSubjectsTable extends Migration {
         Schema::create('subjects', function($table) {
             $table->increments('id');
             $table->string('subject_code', 16);
-            $table->string('name', 256)->nullable();
+            $table->string('name', 255)->nullable();
+            $table->timestamp('created_at')->default("0000-00-00 00:00:00");
+            $table->timestamp('updated_at')->default("0000-00-00 00:00:00");
+
         });
     }
 
