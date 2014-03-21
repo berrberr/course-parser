@@ -37,16 +37,15 @@ def getTimetablePages()
           ttForm.course = course_code
           ttForm.subject = subject_code
           resp = a.submit(ttForm, ttForm.buttons.first)
-          tt_doc = Nokogiri::HTML(resp.body)
 
           #check if there is a link to the course page
-          #courseLinks = tt_doc.css('a[target=details]')
           courseLink = resp.link_with(:text => course_code)
           if(!courseLink.nil?) then
             # courseHref = MTTURL + courseLinks[0]['href']
             # puts "#{subject_code}-#{course_code} href: #{courseHref.inspect}"
             # coursePage = a.get(courseHref)
             coursePage = courseLink.click
+            coursePageDoc = Nokogiri::HTML(coursePage.body)
 
             #write the contents of the course page to a file for parsing later
             fPath = 'courses/' + subject_code + '/' + course_code + '.html'
