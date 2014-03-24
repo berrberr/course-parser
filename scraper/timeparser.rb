@@ -1,12 +1,13 @@
 require 'mechanize'
 require 'nokogiri'
 require 'fileutils'
+require 'optparse'
 
 #URL for timetable page
 MTTURL = "https://adweb.cis.mcmaster.ca/mtt/"
 
 
-def getTimetablePages()
+def get_timetable_pages()
 
   #create Mechanize instance
   a = Mechanize.new
@@ -63,4 +64,46 @@ def getTimetablePages()
   end
 end
 
-getTimetablePages()
+def check_course_exists(course_code, subject_code)
+  puts "COURSE: " + course_code.inspect + "  SUBJ: " + subject_code
+  return true
+end
+
+def parse_file(filename)
+  puts 'Parsing: ' + filename
+  f = File.open(filename)
+  doc = Nokogiri::HTML(f)
+  output = {}
+  i = 1
+
+  courseHeader = doc.xpath('//table//tr[contains(., "Course Offering")]')
+  subjectCode = courseHeader.css('td:nth-child(2)').text.gsub(/\s+/, "")
+  courseCode = courseHeader.css('td:nth-child(3)').text.gsub(/\s+/, "")
+
+  if(check_course_exists(courseCode, subjectCode)) then
+    doc.xpath('//table[.//th[contains(., "Status")]]//tr').each do |tr|
+      if(i >= 4) then #the course timetable rows start at the 4th tr
+        puts "Days: #{tr.css('td:nth-child(3)')}\nTimes: #{tr.css('td:nth-child(4)')}"
+      end
+      i = i + 1
+    end
+  end
+end
+
+def parse_files_in_folder(folder_name)
+  puts 'Starting parse on folder: ' + folder_name
+
+  Dir.glob(folder_name + '/**/*').each do |f|
+    if(File.file?(f))
+      parse_file(f)
+    end
+  end
+
+end
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: timeparser.rb [directory_path]'
+
+  opts.on('-d', '--directory DIR', 'Directory Path') { |d| parse_files_in_folder(d) }
+  opts.on('-g', '--get', 'Get Pages') { |g| get_timetable_pages() }
+end.parse!
