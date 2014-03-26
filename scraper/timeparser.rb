@@ -2,10 +2,12 @@ require 'mechanize'
 require 'nokogiri'
 require 'fileutils'
 require 'optparse'
+require 'mysql2'
 
 #URL for timetable page
 MTTURL = "https://adweb.cis.mcmaster.ca/mtt/"
 
+@client = Mysql2::Client.new(:host => 'localhost', :username => 'root', :database => 'coursesite')
 
 def get_timetable_pages()
 
@@ -16,57 +18,106 @@ def get_timetable_pages()
   #get the subject codes from the tt page
   ttPage = a.get(MTTURL)
 
-  subjects = []
+  subjects = {}
   courses = ['2AA3', '1AA3']
   doc = Nokogiri::HTML(ttPage.body)
   doc.css('select[name=subject]').css('option').each do |subject|
-    if(subject['value'] != 'all') then subjects << subject['value'] end
+    if(subject['value'] != 'all') then subjects[subject.text.split('-')[0]] = subject['value'] end
   end
 
-  i = 0
   if(!subjects.empty?) then
     #each subject code
-    subjects.each do |subject_code|
-      if(i < 3) then
-        i = i + 1
-        #each course for that subject
-        courses.each do |course_code|
+    subjects.each do |subject_name, subject_code|
+      #all courses for the subject
+      courses_query = "SELECT * FROM courses WHERE subject_code='" + subject_name + "'"
+      courses = @client.query(courses_query)
+      courses.map do |course|
+        #get the TT main page, get the form from it, submit contents
+        ttPage = a.get(MTTURL)
+        ttForm = ttPage.form('MTTSearch')
+        ttForm.course = course['course_code']
+        ttForm.subject = subject_code
+        resp = a.submit(ttForm, ttForm.buttons.first)
 
-          #get the TT main page, get the form from it, submit contents
-          ttPage = a.get(MTTURL)
-          ttForm = ttPage.form('MTTSearch')
-          ttForm.course = course_code
-          ttForm.subject = subject_code
-          resp = a.submit(ttForm, ttForm.buttons.first)
+        #check if there is a link to the course page
+        courseLink = resp.link_with(:text => course['course_code'])
+        if(!courseLink.nil?) then
+          # courseHref = MTTURL + courseLinks[0]['href']
+          # puts "#{subject_code}-#{course['course_code']} href: #{courseHref.inspect}"
+          # coursePage = a.get(courseHref)
+          coursePage = courseLink.click
 
-          #check if there is a link to the course page
-          courseLink = resp.link_with(:text => course_code)
-          if(!courseLink.nil?) then
-            # courseHref = MTTURL + courseLinks[0]['href']
-            # puts "#{subject_code}-#{course_code} href: #{courseHref.inspect}"
-            # coursePage = a.get(courseHref)
-            coursePage = courseLink.click
-            coursePageDoc = Nokogiri::HTML(coursePage.body)
-
-            #write the contents of the course page to a file for parsing later
-            fPath = 'courses/' + subject_code + '/' + course_code + '.html'
-            dirname = File.dirname(fPath)
-            unless File.directory?(dirname)
-             FileUtils.mkdir_p(dirname)
-            end
-
-            File.write(fPath, coursePage.body)
-            puts 'Wrote: ' + fPath
+          #write the contents of the course page to a file for parsing later
+          fPath = 'courses/' + subject_code + '/' + course['course_code'] + '.html'
+          dirname = File.dirname(fPath)
+          unless File.directory?(dirname)
+           FileUtils.mkdir_p(dirname)
           end
+
+          File.write(fPath, coursePage.body)
+          puts 'Wrote: ' + fPath
+        else
+          puts "Skipped: #{subject_code} - #{course['course_code']}"
         end
+        #wait for next exec
+        sleep Random.new.rand(1..10) 
       end
     end
   end
 end
 
 def check_course_exists(course_code, subject_code)
-  puts "COURSE: " + course_code.inspect + "  SUBJ: " + subject_code
-  return true
+  check_query = "SELECT id FROM courses WHERE subject_code='" + subject_code + "' AND course_code='" + course_code + "'"
+  return (@client.query(check_query).count != 0)
+end
+
+class CourseTime
+  def initialize(params = {})
+    @tr = params.fetch(:tr)
+    @course_code = params.fetch(:course_code)
+    @subject_code = params.fetch(:subject_code)
+    @daytime = params.fetch(:daytime, nil)
+  end
+
+  def clean_data(data)
+    return data.gsub(/[^0-9a-z \/-]/i, "")
+  end
+
+  def get_day_times()
+    days = @tr.css('td:nth-child(3)').text
+    times = @tr.css('td:nth-child(4)').text + ':' + @tr.css('td:nth-child(5)').text
+    if(!days.empty? and !times.empty?) then
+      days_arr = days.split(' ').map { |d| d.strip.upcase }
+      days_arr.map! { |d| d + times + ';' }
+      return days_arr.join('')
+    else
+      return false
+    end
+  end
+
+  def get_term()
+    return clean_data(@tr.css('td:nth-child(6)').text)
+  end
+
+  def get_prof()
+    return clean_data(@tr.css('td:nth-child(8)').text)
+  end
+
+  def get_core()
+    return clean_data(@tr.css('td:nth-child(2)').text)
+  end
+
+  def get_location()
+    return clean_data(@tr.css('td:nth-child(7)').text)
+  end
+
+  #TODO: check if time already exists?
+  def parse_data()
+    q = "INSERT INTO times(course_code, subject_code, times, professor_id, room, core, notes, term, session, daytime, created_at, updated_at)
+    VALUES('#{@course_code}', '#{@subject_code}', '#{get_day_times}')"
+    return q
+  end
+
 end
 
 def parse_file(filename)
@@ -77,13 +128,19 @@ def parse_file(filename)
   i = 1
 
   courseHeader = doc.xpath('//table//tr[contains(., "Course Offering")]')
-  subjectCode = courseHeader.css('td:nth-child(2)').text.gsub(/\s+/, "")
-  courseCode = courseHeader.css('td:nth-child(3)').text.gsub(/\s+/, "")
+  subject_code = courseHeader.css('td:nth-child(2)').text.gsub(/[^0-9a-z ]/i, "")
+  course_code = courseHeader.css('td:nth-child(3)').text.gsub(/[^0-9a-z ]/i, "")
 
-  if(check_course_exists(courseCode, subjectCode)) then
+  if(check_course_exists(course_code, subject_code)) then
     doc.xpath('//table[.//th[contains(., "Status")]]//tr').each do |tr|
       if(i >= 4) then #the course timetable rows start at the 4th tr
-        puts "Days: #{tr.css('td:nth-child(3)')}\nTimes: #{tr.css('td:nth-child(4)')}"
+        #puts "Days: #{tr.css('td:nth-child(3)')}\nTimes: #{tr.css('td:nth-child(4)')}"
+        course_time = CourseTime.new({
+          :tr => tr,
+          :course_code => course_code,
+          :subject_code => subject_code
+        })
+        puts "TIMESLOT: #{i} #{course_time.parse_data()}"
       end
       i = i + 1
     end
