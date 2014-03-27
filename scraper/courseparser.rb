@@ -18,6 +18,7 @@ def parse_course_title(title)
   return title.sub(/\{(.*?)\}/, '').strip
 end
 
+#MySQL timestamp format
 TimeFmtStr = "%Y-%m-%d %H:%M:%S"
 
 def parse_file(filename)
