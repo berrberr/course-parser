@@ -12,7 +12,7 @@ MTTURL = "https://adweb.cis.mcmaster.ca/mtt/"
 #MySQL timestamp format
 TimeFmtStr = "%Y-%m-%d %H:%M:%S"
 
-def get_timetable_pages()
+def get_timetable_pages(start_from)
   #create Mechanize instance
   a = Mechanize.new
   a.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -23,14 +23,17 @@ def get_timetable_pages()
   subjects = {}
   courses = ['2AA3', '1AA3']
   doc = Nokogiri::HTML(ttPage.body)
+  start_reached = start_from.nil?
   doc.css('select[name=subject]').css('option').each do |subject|
-    if(subject['value'] != 'all') then subjects[subject.text.split('-')[0]] = subject['value'] end
+    if(!start_reached) then start_reached = subject['value'] == start_from end
+    if(start_reached) then subjects[subject.text.split('-')[0]] = subject['value'] end
+    #if(subject['value'] != 'all') then subjects[subject.text.split('-')[0]] = subject['value'] end
   end
 
   if(!subjects.empty?) then
-    begin
-      #each subject code
-      subjects.each do |subject_name, subject_code|
+    #each subject code
+    subjects.each do |subject_name, subject_code|
+      begin
         #all courses for the subject
         courses_query = "SELECT * FROM courses WHERE subject_code='" + subject_name + "'"
         courses = @client.query(courses_query)
@@ -70,9 +73,9 @@ def get_timetable_pages()
           #wait for next exec
           sleep Random.new.rand(1..10) 
         end
+      rescue
+        puts "Something bad happened! Going to next"
       end
-    rescue
-      puts "Something bad happened: #{subject_name}, #{subject_code}"
     end
   end
 end
@@ -229,6 +232,6 @@ OptionParser.new do |opts|
   opts.banner = 'Usage: timeparser.rb [directory_path]'
 
   opts.on('-d', '--directory DIR', 'Directory Path') { |d| parse_files_in_folder(d) }
-  opts.on('-g', '--get', 'Get Pages') { |g| get_timetable_pages() }
+  opts.on('-g', '--get START_FROM', 'Get Pages') { |g| get_timetable_pages(g) }
   opts.on('-p', '--professors', 'Get Professor List') { |g| get_professor_list() }
 end.parse!
