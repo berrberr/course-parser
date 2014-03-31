@@ -1,3 +1,4 @@
+.DS_Store
 web/app/vendor/*
 web/node_modules/*
 web/lib/*

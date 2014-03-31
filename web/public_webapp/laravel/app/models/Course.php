@@ -11,6 +11,9 @@ class Course extends Eloquent {
   public function getCoursesBySubject($subject) {
     return Course::where('subject_code', '=', $subject)->get();
   }
-}
+
+  public function times() {
+    return $this->hasMany('Time', 'course_code', 'course_code');
+  }}
 
 ?>

@@ -30,11 +30,15 @@
                   <div class="col-xs-12 course-list-description">
                     {{ $course->description }}
                   </div>
-                  <div class="col-xs-12 course-time">
+                  <div class="col-xs-1 course-time">
                     <em>Times:</em>
                   </div>
-                  <div class="col-xs-12 course-instructor">
-                    <em>Instructor:</em>
+                  <div class="col-xs-11 course-time">
+                    <div class="row">
+                      @if(isset($course->times))
+                        Times here
+                      @endif
+                    </div>
                   </div>
                 </div>
               </td>

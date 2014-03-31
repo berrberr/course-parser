@@ -17,6 +17,10 @@ def get_timetable_pages(start_from)
   a = Mechanize.new
   a.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
+  #so it wont time out
+  a.follow_meta_refresh = true
+  a.keep_alive = false
+
   #get the subject codes from the tt page
   ttPage = a.get(MTTURL)
 
@@ -73,8 +77,8 @@ def get_timetable_pages(start_from)
           #wait for next exec
           sleep Random.new.rand(1..10) 
         end
-      rescue
-        puts "Something bad happened! Going to next"
+      rescue => msg
+        puts "Something bad happened! #{msg}"
       end
     end
   end
@@ -103,6 +107,23 @@ def get_professor_list()
                                   VALUES('#{first_name}', '#{last_name}', '#{timestamp}', '#{timestamp}')"
         @client.query(professor_insert_query)
         puts "INSERTED: #{first_name} #{last_name}"
+      end
+    end
+  end
+
+  subjects = {}
+  doc.css('select[name=subject]').css('option').each do |subject|
+    if(subject['value'] != 'all') then subjects[subject.text.split('-')[0]] = subject['value'] end
+  end
+
+  if(!subjects.empty?) then
+    subjects.each do |subject_code, mtt_code|
+      subject_code_query = "SELECT id FROM subjects WHERE subject_code='#{subject_code}'"
+      if(@client.query(subject_code_query).count != 0) then
+        timestamp = Time.now.strftime(TimeFmtStr)
+        mtt_code_query = "UPDATE subjects SET mtt_code='#{mtt_code}', updated_at='#{timestamp}' WHERE subject_code='#{subject_code}'"
+        @client.query(mtt_code_query)
+        puts "Inserted MTT: #{mtt_code_query}"
       end
     end
   end
@@ -172,13 +193,14 @@ class CourseTime
     return clean_data(@tr.css('td:nth-child(9)').text)
   end
 
-  #TODO: check if time already exists? Also, write to DB
+  #TODO: check if time already exists?
   def parse_data()
     timestamp = Time.now.strftime(TimeFmtStr)
-    q = "INSERT INTO times(course_code, subject_code, times, professor_id, room, core, notes, term, session, daytime, created_at, updated_at)
-        VALUES('#{@course_code}', '#{@subject_code}', '#{get_day_times()}', #{get_prof()}, '#{get_location()}', '#{get_core()}',
-                '#{get_notes()}', #{get_term()}, '#{@session}', '#{@daytime}', #{timestamp}, #{timestamp})"
-    return q
+    time_query = "INSERT INTO times(course_code, subject_code, times, professor_id, room, core, notes, term, session, daytime, created_at, updated_at)
+    VALUES('#{@course_code}', '#{@subject_code}', '#{get_day_times()}', #{get_prof()}, '#{get_location()}', '#{get_core()}',
+          '#{get_notes()}', #{get_term()}, '#{@session}', '#{@daytime}', #{timestamp}, #{timestamp})"
+    @client.query(time_query)
+    puts "Inserted query: #{time_query}"
   end
 
 end
