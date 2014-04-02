@@ -13,7 +13,7 @@ class Course extends Eloquent {
   }
 
   public function times() {
-    return $this->hasMany('Time', 'course_code', 'course_code');
+    return $this->hasMany('Time', 'course_code', 'course_code')->where('subject_code', $this->subject_code);
   }}
 
 ?>

@@ -145,12 +145,16 @@ class CourseTime
   end
 
   def clean_data(data)
-    return data.gsub(/[^0-9a-z \/\-\,']/i, "")
+    if(data) then
+      return data.gsub(/[^0-9a-z \-\/:;]/i, "")
+    else
+      return ''
+    end
   end
 
   def get_day_times()
     days = @tr.css('td:nth-child(3)').text
-    times = @tr.css('td:nth-child(4)').text + ':' + @tr.css('td:nth-child(5)').text
+    times = @tr.css('td:nth-child(4)').text + '*' + @tr.css('td:nth-child(5)').text
     if(!days.empty? and !times.empty?) then
       days_arr = days.split(' ').map { |d| d.strip.upcase }
       days_arr.map! { |d| d + times + ';' }
@@ -165,19 +169,21 @@ class CourseTime
   end
 
   def get_prof()
-    prof_name = clean_data(@tr.css('td:nth-child(8)').text)
+    prof_name = clean_data(@tr.css('td:nth-child(8)').text).strip
 
-    if(!prof_name.nil?) then
-      if(prof_name.split(',').size > 1) then
-        first_name = @client.escape(prof_name.split(',')[1].strip)
-        last_name = @client.escape(prof_name.split(',')[0].strip)
+    if(!prof_name.empty?) then
+      if(prof_name.split(' ').size > 1) then
+        #TODO: split by regex on space here (>1 space)
+        first_name = @client.escape(prof_name.split(' ')[1].strip)
+        last_name = @client.escape(prof_name.split(' ')[0].strip)
         professor_query = "SELECT * FROM professors WHERE first_name='#{first_name}' AND last_name='#{last_name}'"
         if(@client.query(professor_query).count != 0) then
           return @client.query(professor_query).first['id']
         end
       end
     end
-    return nil
+    #make -1 the not found id
+    return -1
   end
 
   def get_core()
@@ -195,12 +201,21 @@ class CourseTime
 
   #TODO: check if time already exists?
   def parse_data()
-    timestamp = Time.now.strftime(TimeFmtStr)
-    time_query = "INSERT INTO times(course_code, subject_code, times, professor_id, room, core, notes, term, session, daytime, created_at, updated_at)
-    VALUES('#{@course_code}', '#{@subject_code}', '#{get_day_times()}', #{get_prof()}, '#{get_location()}', '#{get_core()}',
-          '#{get_notes()}', #{get_term()}, '#{@session}', '#{@daytime}', #{timestamp}, #{timestamp})"
-    @client.query(time_query)
-    puts "Inserted query: #{time_query}"
+    time_check_query = "SELECT id FROM times WHERE course_code='#{@course_code}' AND subject_code='#{@subject_code}' AND times='#{get_day_times}'"
+    if(@client.query(time_check_query).count == 0) then
+      if(get_day_times()) then
+        timestamp = Time.now.strftime(TimeFmtStr)
+        time_query = "INSERT INTO times(course_code, subject_code, times, professor_id, room, core, notes, term, session, daytime, created_at, updated_at)
+        VALUES('#{@course_code}', '#{@subject_code}', '#{get_day_times()}', #{get_prof()}, '#{get_location()}', '#{get_core()}',
+              '#{get_notes()}', #{get_term()}, '#{@session}', '#{@daytime}', '#{timestamp}', '#{timestamp}')"
+        puts "Inserted query: #{time_query}"
+        @client.query(time_query)
+      else
+        puts "ERROR: Parsing times failed for #{@subject_code} - #{@course_code}"
+      end
+    else
+      puts "ERROR: Duplicate: #{time_check_query}"
+    end
   end
 
 end
@@ -232,7 +247,7 @@ def parse_file(filename)
           :session => session,
           :daytime => daytime
         })
-        puts "TIMESLOT: #{i} #{course_time.parse_data()}"
+        course_time.parse_data()
       end
       i = i + 1
     end

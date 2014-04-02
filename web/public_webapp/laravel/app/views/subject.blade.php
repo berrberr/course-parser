@@ -35,9 +35,13 @@
                   </div>
                   <div class="col-xs-11 course-time">
                     <div class="row">
-                      @if(isset($course->times))
-                        Times here
-                      @endif
+                      @foreach($course->times as $time)
+                        <div class="alert alert-info">
+                          @foreach($time->parseTimes() as $slot)
+                            {{ $slot }}
+                          @endforeach
+                        </div>
+                      @endforeach
                     </div>
                   </div>
                 </div>
