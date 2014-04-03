@@ -5,7 +5,7 @@
 @section('main')
   @if(isset($subject))
     <div class="jumbotron">{{ $subject->name }}</div>
-    <div class="row">
+    <div class="row main-content">
       <div class="col-xs-3">
         @yield('tree')
       </div>
@@ -36,13 +36,30 @@
                   <div class="col-xs-11 course-time">
                     <div class="row">
                       @foreach($course->times as $time)
-                        <div class="alert alert-info">
+                        <div class="col-xs-4">
+                        <table>
+                          <tr><td><b>Term: </b>{{ $time->term }}</td></tr>
+                          <tr><td><b>Core: </b>{{ $time->core }}</td></tr>
+                          <tr>
+                            @if($time->professor)
+                              <td>
+                              <b>Instructor: </b>
+                              {{ $time->professor->last_name }}, {{ $time->professor->first_name }}
+                              </td>
+                            @else
+                              <td><b>Instructor: </b>No instructor yet.</td>
+                            @endif
+                          </tr>
                           @foreach($time->parseTimes() as $slot)
-                            {{ $slot }}
+                            <tr>
+                              <td><b>{{ $slot["day"] }}</b> {{ $slot["start_time"] }} - {{ $slot["end_time"] }}</td>
+                            </tr>
                           @endforeach
+                        </table>
                         </div>
                       @endforeach
                     </div>
+                    <span class="registrar-link"><a href="#">Go to registrar page</a></span>
                   </div>
                 </div>
               </td>
