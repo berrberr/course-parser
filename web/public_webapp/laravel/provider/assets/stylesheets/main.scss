@@ -35,6 +35,22 @@
   }
 }
 
+.course-timetable {
+  tr:first-child td {
+    width: 10%;
+  }
+}
+
+.course-timetable-head {
+  font-size: 20px;
+  border-top: 0;
+}
+
+.course-timetable-core-head {
+  font-weight: bold;
+  font-size: 16px;
+}
+
 .course-panel {
   .panel-body {
     padding-bottom: 0;
@@ -42,6 +58,8 @@
 }
 
 .registrar-link {
-  float: right;
+  font-size: 10px;
+  padding: 2px 2px 0 2px;
 }
+
 

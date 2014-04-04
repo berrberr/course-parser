@@ -56,7 +56,24 @@
           <h3 class="panel-title">Timetable</h3>
         </div>
         <div class="panel-body">
-          
+        <table class="table course-timetable">
+        <tr><th class="course-timetable-head" colspan=2>{{ $config["session"] }}</th></tr>
+        <tbody>
+        @foreach($times as $time)
+          <tr><th class="course-timetable-core-head" colspan=2>Core: {{ $time->core }}</th></tr>
+          <tr><td><b>Term:</b></td><td>{{ $time->term }}</td></tr>
+          <tr><td><b>Instructor:</b></td><td>
+          @if($time->professor)
+            {{ $time->professor->last_name }}, {{ $time->professor->first_name }}
+          @else
+            No instructor yet.
+          @endif
+          </td></tr>
+          <tr><td><b>Room:</b></td><td>{{ $time->room }}</td></tr>
+          <tr><td><b>Times: </b></td><td>{{ $time->parseTimes(true) }}</td></tr>
+        @endforeach
+        </tbody>
+        </table>
         </div>
       </div>
       

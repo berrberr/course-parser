@@ -21,8 +21,15 @@ Route::get('/course/{subject_code}/{course_code}', array(
   'as' => 'course', 
   function($subject_code, $course_code) {
     $course = Course::getCourseByCodeSubject($course_code, $subject_code);
+    $times = $course->times;
+    //TODO: change this to global config object
+    $config = ['session' => 'Spring/Summer 2014'];
     if(isset($course)) {
-      return View::make('course')->with('course', $course);
+      return View::make('course')->with([
+        'course' => $course, 
+        'times' => $times,
+        'config' => $config
+      ]);
     } else {
       return View::make('course')->with('error', 404);
     }

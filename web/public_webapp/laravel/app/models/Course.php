@@ -14,6 +14,12 @@ class Course extends Eloquent {
 
   public function times() {
     return $this->hasMany('Time', 'course_code', 'course_code')->where('subject_code', $this->subject_code);
-  }}
+  }
+
+  public function subject() {
+    return $this->belongsTo('Subject', 'subject_code', 'subject_code');
+  }
+}
+
 
 ?>

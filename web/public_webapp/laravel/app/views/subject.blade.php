@@ -34,7 +34,6 @@
                     <em>Times:</em>
                   </div>
                   <div class="col-xs-11 course-time">
-                    <div class="row">
                       @foreach($course->times as $time)
                         <div class="col-xs-4">
                         <table>
@@ -56,10 +55,11 @@
                             </tr>
                           @endforeach
                         </table>
+                          <span class="registrar-link">
+                          {{ $time->registrarLink($course) }}
+                          </span>
                         </div>
                       @endforeach
-                    </div>
-                    <span class="registrar-link"><a href="#">Go to registrar page</a></span>
                   </div>
                 </div>
               </td>
