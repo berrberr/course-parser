@@ -3,6 +3,7 @@ require 'nokogiri'
 require 'fileutils'
 require 'optparse'
 require 'mysql2'
+require 'slop'
 
 #URL for timetable page
 MTTURL = "https://adweb.cis.mcmaster.ca/mtt/"
@@ -12,7 +13,10 @@ MTTURL = "https://adweb.cis.mcmaster.ca/mtt/"
 #MySQL timestamp format
 TimeFmtStr = "%Y-%m-%d %H:%M:%S"
 
-def get_timetable_pages(start_from)
+# Download timetable pages
+# @param start_from [str] subject code to start from (default nil)
+def get_timetable_pages(start_from = nil)
+  puts "SF: #{start_from.inspect} Nil? #{start_from.nil?}"
   #create Mechanize instance
   a = Mechanize.new
   a.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -25,10 +29,10 @@ def get_timetable_pages(start_from)
   ttPage = a.get(MTTURL)
 
   subjects = {}
-  courses = ['2AA3', '1AA3']
   doc = Nokogiri::HTML(ttPage.body)
   start_reached = start_from.nil?
   doc.css('select[name=subject]').css('option').each do |subject|
+    puts "loop #{subject}"
     if(!start_reached) then start_reached = subject['value'] == start_from end
     if(start_reached) then subjects[subject.text.split('-')[0]] = subject['value'] end
     #if(subject['value'] != 'all') then subjects[subject.text.split('-')[0]] = subject['value'] end
@@ -84,6 +88,7 @@ def get_timetable_pages(start_from)
   end
 end
 
+# Get and insert professor info into DB
 def get_professor_list()
   #create Mechanize instance
   a = Mechanize.new
@@ -265,10 +270,17 @@ def parse_files_in_folder(folder_name)
 
 end
 
-OptionParser.new do |opts|
-  opts.banner = 'Usage: timeparser.rb [directory_path]'
+opts = Slop.parse do
+  on :n, :name=, 'your name'
+  on :d, 'directory'
+end
 
-  opts.on('-d', '--directory DIR', 'Directory Path') { |d| parse_files_in_folder(d) }
-  opts.on('-g', '--get START_FROM', 'Get Pages') { |g| get_timetable_pages(g) }
-  opts.on('-p', '--professors', 'Get Professor List') { |g| get_professor_list() }
-end.parse!
+puts opts.to_hash
+# OptionParser.new do |opts|
+#   opts.banner = 'Usage: timeparser.rb [directory_path]'
+
+#   opts.on('-d', '--directory DIR', 'Directory Path') { |d| parse_files_in_folder(d) }
+#   opts.on('-a', '--get all', 'Get All Pages') {|a| get_timetable_pages() }
+#   opts.on('-g', '--get START_FROM', 'Get Pages') { |g| get_timetable_pages(g) }
+#   opts.on('-p', '--professors', 'Get Professor List') { |g| get_professor_list() }
+# end.parse!
