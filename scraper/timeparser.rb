@@ -1,7 +1,6 @@
 require 'mechanize'
 require 'nokogiri'
 require 'fileutils'
-require 'optparse'
 require 'mysql2'
 require 'slop'
 

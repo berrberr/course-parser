@@ -4,4 +4,4 @@ web/node_modules/*
 web/lib/*
 scraper/pages/*
 scraper/courses/*
-
+Gemfile.lock
