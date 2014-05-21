@@ -29,7 +29,9 @@ def get_timetable_pages(start_from = nil)
 
   subjects = {}
   doc = Nokogiri::HTML(ttPage.body)
-  start_reached = start_from.nil?
+  start_reached = start_from.nil? or start_from == -1
+
+  #iterate over the subject combo box and create a hash of form subject_name => subject MTT code
   doc.css('select[name=subject]').css('option').each do |subject|
     puts "loop #{subject}"
     if(!start_reached) then start_reached = subject['value'] == start_from end
@@ -41,7 +43,8 @@ def get_timetable_pages(start_from = nil)
     #each subject code
     subjects.each do |subject_name, subject_code|
       begin
-        #all courses for the subject
+        #get the list of courses by subject name (which is the code) from the database
+        #NOTE: must have run coursetimes.rb first to generate this list
         courses_query = "SELECT * FROM courses WHERE subject_code='" + subject_name + "'"
         courses = @client.query(courses_query)
         courses.map do |course|
@@ -50,6 +53,9 @@ def get_timetable_pages(start_from = nil)
           ttForm = ttPage.form('MTTSearch')
           ttForm.course = course['course_code']
           ttForm.subject = subject_code
+          #NOTE: change this to the course session value we are parsing
+          #TODO: make this a param
+          ttForm.session = 'U201405'
           resp = a.submit(ttForm, ttForm.buttons.first)
 
           begin
@@ -270,11 +276,16 @@ def parse_files_in_folder(folder_name)
 end
 
 opts = Slop.parse do
-  on :n, :name=, 'your name'
-  on :d, 'directory'
+  on :d, :directory=, 'Directory Path'
+  on :a, 'get_all', 'Get All Pages'
+  on :g, :start=, :default => -1
+  on :p, 'professors', 'Get Professor List'
 end
 
-puts opts.to_hash
+unless opts[:d].nil? then parse_files_in_folder(opts[:d]) end
+unless opts[:g].nil? then get_timetable_pages(opts[:g]) end
+unless opts[:a].nil? then get_timetable_pages() end
+unless opts[:p].nil? then get_professor_list() end
 # OptionParser.new do |opts|
 #   opts.banner = 'Usage: timeparser.rb [directory_path]'
 
