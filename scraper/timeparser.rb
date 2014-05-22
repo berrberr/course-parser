@@ -33,7 +33,6 @@ def get_timetable_pages(start_from = nil)
 
   #iterate over the subject combo box and create a hash of form subject_name => subject MTT code
   doc.css('select[name=subject]').css('option').each do |subject|
-    puts "loop #{subject}"
     if(!start_reached) then start_reached = subject['value'] == start_from end
     if(start_reached) then subjects[subject.text.split('-')[0]] = subject['value'] end
     #if(subject['value'] != 'all') then subjects[subject.text.split('-')[0]] = subject['value'] end

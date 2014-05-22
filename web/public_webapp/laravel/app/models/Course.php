@@ -16,6 +16,16 @@ class Course extends Eloquent {
     return $this->hasMany('Time', 'course_code', 'course_code')->where('subject_code', $this->subject_code);
   }
 
+  public function professors() {
+    $professors = array();
+    foreach($this->times as $time) {
+      if($time->professor) {
+        $professors[] = $time->professor->toArray();
+      }
+    }
+    return $professors;
+  }
+
   public function subject() {
     return $this->belongsTo('Subject', 'subject_code', 'subject_code');
   }

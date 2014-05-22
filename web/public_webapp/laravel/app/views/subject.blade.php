@@ -30,10 +30,13 @@
                   <div class="col-xs-12 course-list-description">
                     {{ $course->description }}
                   </div>
-                  <div class="col-xs-1 course-time">
-                    <em>Times:</em>
-                  </div>
-                  <div class="col-xs-11 course-time">
+                  @foreach($course->professors as $professor)
+                    {{ var_dump($professor) }}
+                    <div class="col-xs-12 course-time-header" course-code={{ $course->course_code }}>
+                      <em>Times:</em>
+                    </div>
+                  @endforeach
+                  <div class="col-xs-11 course-time" course-code={{ $course->course_code }}>
                       @foreach($course->times as $time)
                         <div class="col-xs-4">
                         <table>
