@@ -18,11 +18,11 @@ class Course extends Eloquent {
 
   public function professors() {
     $professors = array();
-    foreach($this->times as $time) {
-      if($time->professor) {
-        $professors[] = $time->professor->toArray();
-      }
-    }
+    // foreach($this->times as $time) {
+    //   if($time->professor) {
+    //     $professors[] = $time->professor->toArray();
+    //   }
+    // }
     return $professors;
   }
 

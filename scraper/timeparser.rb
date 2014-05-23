@@ -143,6 +143,30 @@ def check_course_exists(course_code, subject_code)
   return (@client.query(check_query).count != 0)
 end
 
+class CourseDatabase
+  def initialize()
+    @TimeFmtStr = "%Y-%m-%d %H:%M:%S"
+    @client = Mysql2::Client.new(:host => 'localhost', :username => 'root', :database => 'coursesite')
+  end
+
+  def get_timestamp()
+    return Time.now.strftime(@TimeFmtStr)
+  end
+
+ # mtt_code_query = "UPDATE subjects SET mtt_code='#{mtt_code}', updated_at='#{timestamp}' WHERE subject_code='#{subject_code}'"
+  def update_query(params)
+    query = "UPDATE #{params.database} SET "
+    params.data.each do |data|
+      insert_data = if data.val.is_a? Integer then data.val else "'#{data.val}'" end
+      query += "#{data.column}=#{insert_data}, "
+    end
+  end
+
+  def insert_query(params)
+
+  end
+end
+
 class CourseTime
   def initialize(params = {})
     @tr = params.fetch(:tr)
