@@ -3,6 +3,8 @@ require 'nokogiri'
 require 'fileutils'
 require 'mysql2'
 require 'slop'
+require 'ostruct'
+require_relative 'coursedatabase'
 
 #URL for timetable page
 MTTURL = "https://adweb.cis.mcmaster.ca/mtt/"
@@ -78,6 +80,15 @@ def get_timetable_pages(start_from = nil)
             end
 
             File.write(fPath, coursePage.body)
+            timestamp = Time.now.strftime(TimeFmtStr)
+            CourseDatabase.update_query(OpenStruct.new(
+              :table => 'courses',
+              :data => [{:column => 'parsed_at', :val => timestamp}],
+              :condition => [
+                {:column => 'course_code', :val => course['course_code']}, 
+                {:column => 'subject_code', :val => subject_name}
+              ]
+            ))
             puts 'Wrote: ' + fPath
           else
             puts "Skipped: #{subject_code} - #{course['course_code']}"
@@ -141,30 +152,6 @@ end
 def check_course_exists(course_code, subject_code)
   check_query = "SELECT id FROM courses WHERE subject_code='" + subject_code + "' AND course_code='" + course_code + "'"
   return (@client.query(check_query).count != 0)
-end
-
-class CourseDatabase
-  def initialize()
-    @TimeFmtStr = "%Y-%m-%d %H:%M:%S"
-    @client = Mysql2::Client.new(:host => 'localhost', :username => 'root', :database => 'coursesite')
-  end
-
-  def get_timestamp()
-    return Time.now.strftime(@TimeFmtStr)
-  end
-
- # mtt_code_query = "UPDATE subjects SET mtt_code='#{mtt_code}', updated_at='#{timestamp}' WHERE subject_code='#{subject_code}'"
-  def update_query(params)
-    query = "UPDATE #{params.database} SET "
-    params.data.each do |data|
-      insert_data = if data.val.is_a? Integer then data.val else "'#{data.val}'" end
-      query += "#{data.column}=#{insert_data}, "
-    end
-  end
-
-  def insert_query(params)
-
-  end
 end
 
 class CourseTime
