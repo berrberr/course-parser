@@ -4,7 +4,7 @@ require 'fileutils'
 require 'mysql2'
 require 'slop'
 require 'ostruct'
-require_relative 'coursedatabase'
+require_relative 'modules/coursedatabase'
 
 #URL for timetable page
 MTTURL = "https://adweb.cis.mcmaster.ca/mtt/"
@@ -73,7 +73,7 @@ def get_timetable_pages(start_from = nil)
             coursePage = courseLink.click
 
             #write the contents of the course page to a file for parsing later
-            fPath = 'courses/' + subject_code + '/' + course['course_code'] + '.html'
+            fPath = 'data/courses/' + subject_code + '/' + course['course_code'] + '.html'
             dirname = File.dirname(fPath)
             unless File.directory?(dirname)
              FileUtils.mkdir_p(dirname)
@@ -83,7 +83,7 @@ def get_timetable_pages(start_from = nil)
             timestamp = Time.now.strftime(TimeFmtStr)
             CourseDatabase.update_query(OpenStruct.new(
               :table => 'courses',
-              :data => [{:column => 'parsed_at', :val => timestamp}],
+              :timestamp => ['parsed_at'],
               :condition => [
                 {:column => 'course_code', :val => course['course_code']}, 
                 {:column => 'subject_code', :val => subject_name}
