@@ -1,3 +1,6 @@
+require 'mysql2'
+require 'ostruct'
+
 #TODO: add selects, add auto fill in timestamps
 # params format:
 ## table => [str] name of table
@@ -14,13 +17,11 @@ module CourseDatabase
   end
 
   def self.insert_timestamps(query, params)
-    if(params.timestamp) then
-      ts = get_timestamp()
-      params.timestamp.each do |column|
-        query += "#{column}=#{ts},"
-      end
-      query.slice!((query.length - 1)..-1)
+    ts = get_timestamp()
+    params.timestamp.each do |column|
+      query += "#{column}='#{ts}',"
     end
+    query.slice!((query.length - 1)..-1)
     return query
   end
 
@@ -31,8 +32,12 @@ module CourseDatabase
       insert_data = if data[:val].is_a? Integer then data[:val] else "'#{data[:val]}'" end
       query += "#{data[:column]}=#{insert_data},"
     end
-    query.slice!((query.length - 1)..-1)
-    insert_timestamps(query, params)
+    query = if(params.timestamp) then 
+      insert_timestamps(query, params)
+    else
+      query.slice((query.length - 1)..-1)
+    end
+
     if(params.condition) then
       query += " WHERE "
       params.condition.each do |cond|
@@ -58,3 +63,10 @@ module CourseDatabase
     @client.query(query)
   end
 end
+
+# TEST
+test_update = OpenStruct.new('table' => 'courses', 
+  'data' => [{:column => "course_code", :val => "1AA3"}],
+  'timestamp' => ['updated_at', 'parsed_at'],
+  'condition' => [{:column => "course_code", :val => "1AA3"}, {:column => "subject_code", :val => "ANTHROP"}])
+CourseDatabase.update_query(test_update)
